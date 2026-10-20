@@ -4,10 +4,10 @@
     "input_filter": [],
     "libs": [
         {
-        "url": "https://github.com/open-abap/open-abap-core"
+        "folder": "/open-abap/open-abap-core/"
         },
         {
-        "url": "https://github.com/open-abap/open-abap-seo"
+        "folder": "/open-abap/open-abap-seo/"
         }
     ],
     "write_unit_tests": true,
