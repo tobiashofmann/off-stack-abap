@@ -1,6 +1,8 @@
 allure-report/
 output/
 test-results/
+docs/
+
 # Logs
 logs
 *.log
