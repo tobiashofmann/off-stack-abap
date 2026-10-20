@@ -1,0 +1,561 @@
+CLASS ltcl_test DEFINITION FOR TESTING RISK LEVEL HARMLESS DURATION SHORT FINAL.
+
+  PRIVATE SECTION.
+    METHODS subtract FOR TESTING RAISING cx_static_check.
+    METHODS add FOR TESTING RAISING cx_static_check.
+    METHODS add_long FOR TESTING RAISING cx_static_check.
+    METHODS add_keeps_fraction FOR TESTING RAISING cx_static_check.
+    METHODS add_fraction_carries FOR TESTING RAISING cx_static_check.
+    METHODS subtractsecs_keeps_fraction FOR TESTING RAISING cx_static_check.
+    METHODS subtract_fraction FOR TESTING RAISING cx_static_check.
+    METHODS add_subtract_round_trip FOR TESTING RAISING cx_static_check.
+    METHODS subtractsecs FOR TESTING RAISING cx_static_check.
+    METHODS subtract2 FOR TESTING RAISING cx_static_check.
+    METHODS subtract_initial FOR TESTING RAISING cx_static_check.
+    METHODS move FOR TESTING RAISING cx_static_check.
+    METHODS systemtstmp_syst2utc FOR TESTING RAISING cx_static_check.
+    METHODS systemtstmp_syst2utc_initial FOR TESTING RAISING cx_static_check.
+    METHODS systemtstmp_utc2syst FOR TESTING RAISING cx_static_check.
+    METHODS systemtstmp_utc2syst_invalid FOR TESTING RAISING cx_static_check.
+    METHODS move_to_short1 FOR TESTING RAISING cx_static_check.
+    METHODS td_subtract1 FOR TESTING RAISING cx_static_check.
+    METHODS td_add1 FOR TESTING RAISING cx_static_check.
+    METHODS make_valid_time_utc FOR TESTING RAISING cx_static_check.
+    METHODS make_valid_time_dst_next FOR TESTING RAISING cx_static_check.
+    METHODS make_valid_time_dst_before FOR TESTING RAISING cx_static_check.
+    METHODS make_valid_time_dst_wallclock FOR TESTING RAISING cx_static_check.
+    METHODS make_valid_time_no_dst_zone FOR TESTING RAISING cx_static_check.
+    METHODS make_valid_time_gap_before FOR TESTING RAISING cx_static_check.
+    METHODS make_valid_time_before_est FOR TESTING RAISING cx_static_check.
+    METHODS tstmp2utclong FOR TESTING RAISING cx_static_check.
+    METHODS utclong2tstmp_short FOR TESTING RAISING cx_static_check.
+    METHODS get_system_timezone FOR TESTING RAISING cx_static_check.
+    METHODS syntax1 FOR TESTING RAISING cx_static_check.
+
+ENDCLASS.
+
+CLASS ltcl_test IMPLEMENTATION.
+
+  METHOD subtract.
+
+    CONSTANTS lc_epoch TYPE timestamp VALUE '19700101000000'.
+    CONSTANTS lc_time TYPE timestamp VALUE '19710201000000'.
+    DATA lv_seconds TYPE i.
+
+    lv_seconds = cl_abap_tstmp=>subtract(
+      tstmp1 = lc_time
+      tstmp2 = lc_epoch ).
+
+    cl_abap_unit_assert=>assert_equals(
+      act = lv_seconds
+      exp = 34214400 ).
+  ENDMETHOD.
+
+  METHOD add.
+
+    CONSTANTS lc_time TYPE timestamp VALUE '19710201000000'.
+    DATA lv_time TYPE timestamp.
+
+    lv_time = cl_abap_tstmp=>add(
+      tstmp = lc_time
+      secs  = 5000 ).
+
+    cl_abap_unit_assert=>assert_equals(
+      act = lv_time
+      exp = '19710201012320' ).
+
+  ENDMETHOD.
+
+  METHOD add_long.
+
+    DATA lv_time TYPE timestampl.
+
+    lv_time = cl_abap_tstmp=>add(
+      tstmp = lv_time
+      secs  = 5000 ).
+
+  ENDMETHOD.
+
+  METHOD add_keeps_fraction.
+    DATA lv_from TYPE timestampl.
+    DATA lv_to   TYPE timestampl.
+    lv_from = '20240229235959.5000000'.
+    lv_to = cl_abap_tstmp=>add(
+      tstmp = lv_from
+      secs  = 60 ).
+    cl_abap_unit_assert=>assert_equals(
+      act = lv_to
+      exp = '20240301000059.5000000' ).
+  ENDMETHOD.
+
+  METHOD add_fraction_carries.
+    DATA lv_from TYPE timestampl.
+    DATA lv_to   TYPE timestampl.
+    DATA lv_secs TYPE p LENGTH 8 DECIMALS 2.
+    lv_from = '20240229235959.7000000'.
+    lv_secs = '0.5'.
+    lv_to = cl_abap_tstmp=>add(
+      tstmp = lv_from
+      secs  = lv_secs ).
+    cl_abap_unit_assert=>assert_equals(
+      act = lv_to
+      exp = '20240301000000.2000000' ).
+  ENDMETHOD.
+
+  METHOD subtractsecs_keeps_fraction.
+    DATA lv_from TYPE timestampl.
+    DATA lv_to   TYPE timestampl.
+    lv_from = '20240301000000.2500000'.
+    lv_to = cl_abap_tstmp=>subtractsecs(
+      tstmp = lv_from
+      secs  = 1 ).
+    cl_abap_unit_assert=>assert_equals(
+      act = lv_to
+      exp = '20240229235959.2500000' ).
+  ENDMETHOD.
+
+  METHOD subtract_fraction.
+    DATA lv_from TYPE timestampl.
+    DATA lv_to   TYPE timestampl.
+    DATA lv_diff TYPE tzntstmpl.
+    lv_from = '20240229235959.7000000'.
+    lv_to = '20240301000001.2000000'.
+    lv_diff = cl_abap_tstmp=>subtract(
+      tstmp1 = lv_to
+      tstmp2 = lv_from ).
+    cl_abap_unit_assert=>assert_equals(
+      act = lv_diff
+      exp = '1.5' ).
+  ENDMETHOD.
+
+  METHOD add_subtract_round_trip.
+    DATA lv_from TYPE timestampl.
+    DATA lv_to   TYPE timestampl.
+    DATA lv_diff TYPE i.
+    GET TIME STAMP FIELD lv_from.
+    lv_to = cl_abap_tstmp=>add(
+      tstmp = lv_from
+      secs  = 60 ).
+    lv_diff = cl_abap_tstmp=>subtract(
+      tstmp1 = lv_to
+      tstmp2 = lv_from ).
+    cl_abap_unit_assert=>assert_equals(
+      act = lv_diff
+      exp = 60 ).
+  ENDMETHOD.
+
+  METHOD subtractsecs.
+
+    CONSTANTS lc_time TYPE timestamp VALUE '19820201011000'.
+    DATA lv_time TYPE timestamp.
+
+    lv_time = cl_abap_tstmp=>subtractsecs(
+      tstmp = lc_time
+      secs  = 5000 ).
+
+    cl_abap_unit_assert=>assert_equals(
+      act = lv_time
+      exp = '19820131234640' ).
+
+  ENDMETHOD.
+
+  METHOD subtract2.
+
+    DATA lv_epoch TYPE timestampl.
+    DATA lv_start TYPE timestampl.
+    DATA lv_result TYPE timestampl.
+
+    GET TIME STAMP FIELD lv_start.
+    lv_epoch = '19700101000000'.
+
+    lv_result = cl_abap_tstmp=>subtract(
+      tstmp1 = lv_start
+      tstmp2 = lv_epoch ).
+
+    ASSERT lv_result > 0.
+
+  ENDMETHOD.
+
+  METHOD subtract_initial.
+
+    DATA lv_now     TYPE timestamp.
+    DATA lv_initial TYPE timestamp.
+
+    GET TIME STAMP FIELD lv_now.
+    TRY.
+        cl_abap_tstmp=>subtract(
+          tstmp1 = lv_now
+          tstmp2 = lv_initial ).
+        cl_abap_unit_assert=>fail( ).
+      CATCH cx_parameter_invalid_range.
+        RETURN.
+    ENDTRY.
+
+  ENDMETHOD.
+
+  METHOD move.
+
+    DATA lv_timestamp TYPE timestampl.
+    DATA rv_result TYPE timestamp.
+    DATA lv_str1 TYPE string.
+    DATA lv_str2 TYPE string.
+
+    GET TIME STAMP FIELD lv_timestamp.
+
+    cl_abap_tstmp=>move(
+      EXPORTING
+        tstmp_src = lv_timestamp
+      IMPORTING
+        tstmp_tgt = rv_result ).
+
+    lv_str1 = |{ lv_timestamp }|.
+    lv_str2 = |{ rv_result }|.
+
+    " todo, commented, rounding errors?
+    " cl_abap_unit_assert=>assert_equals(
+    "   act = lv_str1(13)
+    "   exp = lv_str2(13) ).
+
+  ENDMETHOD.
+
+  METHOD systemtstmp_syst2utc.
+
+    DATA lv_timestamp TYPE timestamp.
+
+    cl_abap_tstmp=>systemtstmp_syst2utc(
+      EXPORTING
+        syst_date = '20220101'
+        syst_time = '112233'
+      IMPORTING
+        utc_tstmp = lv_timestamp ).
+
+    cl_abap_unit_assert=>assert_equals(
+      act = lv_timestamp
+      exp = 20220101112233 ).
+
+  ENDMETHOD.
+
+  METHOD systemtstmp_syst2utc_initial.
+
+    TRY.
+        cl_abap_tstmp=>systemtstmp_syst2utc(
+          syst_date = '00000000'
+          syst_time = '110000' ).
+        cl_abap_unit_assert=>fail( ).
+      CATCH cx_parameter_invalid_range.
+        RETURN.
+    ENDTRY.
+
+  ENDMETHOD.
+
+  METHOD systemtstmp_utc2syst.
+    TYPES: BEGIN OF ty_case,
+             timestamp TYPE timestamp,
+             date      TYPE d,
+             time      TYPE t,
+           END OF ty_case.
+    DATA lt_cases TYPE STANDARD TABLE OF ty_case WITH DEFAULT KEY.
+    DATA lv_date TYPE d.
+    DATA lv_time TYPE t.
+
+    lt_cases = VALUE #(
+      ( timestamp = '20220101112233' date = '20220101' time = '112233' )
+      ( timestamp = '20240229000000' date = '20240229' time = '000000' )
+      ( timestamp = '20000229235959' date = '20000229' time = '235959' )
+      ( timestamp = '19000228235959' date = '19000228' time = '235959' )
+      ( timestamp = '00010101000000' date = '00010101' time = '000000' )
+      ( timestamp = '99991231235959' date = '99991231' time = '235959' ) ).
+
+    LOOP AT lt_cases INTO DATA(ls_case).
+      cl_abap_tstmp=>systemtstmp_utc2syst(
+        EXPORTING
+          utc_tstmp = ls_case-timestamp
+        IMPORTING
+          syst_date = lv_date
+          syst_time = lv_time ).
+
+      cl_abap_unit_assert=>assert_equals( act = lv_date
+                                          exp = ls_case-date ).
+      cl_abap_unit_assert=>assert_equals( act = lv_time
+                                          exp = ls_case-time ).
+    ENDLOOP.
+  ENDMETHOD.
+
+  METHOD systemtstmp_utc2syst_invalid.
+    DATA lt_timestamps TYPE STANDARD TABLE OF timestamp WITH DEFAULT KEY.
+
+    lt_timestamps = VALUE #(
+      ( 0 )
+      ( -1 )
+      ( '99991231235960' )
+      ( '100001010000000' )
+      ( '20230001000000' )
+      ( '20231301000000' )
+      ( '20230100000000' )
+      ( '20230431000000' )
+      ( '20230229000000' )
+      ( '19000229000000' )
+      ( '20230101240000' )
+      ( '20230101006000' )
+      ( '20230101000060' ) ).
+
+    LOOP AT lt_timestamps INTO DATA(lv_timestamp).
+      TRY.
+          cl_abap_tstmp=>systemtstmp_utc2syst( utc_tstmp = lv_timestamp ).
+          cl_abap_unit_assert=>fail( ).
+        CATCH cx_parameter_invalid_range.
+          CONTINUE.
+      ENDTRY.
+    ENDLOOP.
+  ENDMETHOD.
+
+  METHOD move_to_short1.
+    DATA lv_long  TYPE timestampl.
+    DATA lv_short TYPE timestamp.
+
+    lv_long = '19700101000059.9'.
+    lv_short = cl_abap_tstmp=>move_to_short( lv_long ).
+
+    " todo,
+    " cl_abap_unit_assert=>assert_equals(
+    "   act = lv_short
+    "   exp = '19700101000100' ).
+  ENDMETHOD.
+
+  METHOD td_subtract1.
+    DATA lv_int TYPE i.
+    cl_abap_tstmp=>td_subtract(
+      EXPORTING
+        date1    = '19900101'
+        time1    = '113000'
+        date2    = '19900101'
+        time2    = '112000'
+      IMPORTING
+        res_secs = lv_int ).
+    cl_abap_unit_assert=>assert_equals(
+      act = lv_int
+      exp = 600 ).
+  ENDMETHOD.
+
+  METHOD td_add1.
+
+    DATA lv_date TYPE d.
+    DATA lv_time TYPE t.
+
+    cl_abap_tstmp=>td_add(
+      EXPORTING
+        date     = '20250505'
+        time     = '111111'
+        secs     = 100
+      IMPORTING
+        res_date = lv_date
+        res_time = lv_time ).
+
+    cl_abap_unit_assert=>assert_equals(
+      act = lv_date
+      exp = '20250505' ).
+
+    cl_abap_unit_assert=>assert_equals(
+      act = lv_time
+      exp = '111251' ).
+
+  ENDMETHOD.
+
+  METHOD make_valid_time_utc.
+*   Valid time - should pass through unchanged
+    DATA lv_date TYPE d.
+    DATA lv_time TYPE t.
+
+    cl_abap_tstmp=>make_valid_time(
+      EXPORTING
+        date_in    = '20250101'
+        time_in    = '120000'
+        time_zone  = 'UTC'
+      IMPORTING
+        date_valid = lv_date
+        time_valid = lv_time ).
+
+    cl_abap_unit_assert=>assert_equals( act = lv_date
+                                        exp = '20250101' ).
+    cl_abap_unit_assert=>assert_equals( act = lv_time
+                                        exp = '120000' ).
+  ENDMETHOD.
+
+  METHOD make_valid_time_dst_next.
+*   CET spring forward: 2025-03-30 02:30 does not exist
+*   op_mode_next -> should give 03:00:00
+    DATA lv_date TYPE d.
+    DATA lv_time TYPE t.
+
+    cl_abap_tstmp=>make_valid_time(
+      EXPORTING
+        date_in    = '20250330'
+        time_in    = '023000'
+        time_zone  = 'CET'
+        mode       = cl_abap_tstmp=>op_mode_next
+      IMPORTING
+        date_valid = lv_date
+        time_valid = lv_time ).
+
+    cl_abap_unit_assert=>assert_equals( act = lv_date
+                                        exp = '20250330' ).
+    cl_abap_unit_assert=>assert_equals( act = lv_time
+                                        exp = '030000' ).
+  ENDMETHOD.
+
+  METHOD make_valid_time_dst_before.
+*   CET spring forward: 2025-03-30 02:30 does not exist
+*   op_mode_before -> should give 01:59:59
+    DATA lv_date TYPE d.
+    DATA lv_time TYPE t.
+
+    cl_abap_tstmp=>make_valid_time(
+      EXPORTING
+        date_in    = '20250330'
+        time_in    = '023000'
+        time_zone  = 'CET'
+        mode       = cl_abap_tstmp=>op_mode_before
+      IMPORTING
+        date_valid = lv_date
+        time_valid = lv_time ).
+
+    cl_abap_unit_assert=>assert_equals( act = lv_date
+                                        exp = '20250330' ).
+    cl_abap_unit_assert=>assert_equals( act = lv_time
+                                        exp = '015959' ).
+  ENDMETHOD.
+
+  METHOD make_valid_time_dst_wallclock.
+*   EST spring forward 2025-03-09: 02:30 does not exist
+*   op_mode_wallclock -> should give 03:30:00
+    DATA lv_date TYPE d.
+    DATA lv_time TYPE t.
+
+    cl_abap_tstmp=>make_valid_time(
+      EXPORTING
+        date_in    = '20250309'
+        time_in    = '023000'
+        time_zone  = 'EST'
+        mode       = cl_abap_tstmp=>op_mode_wallclock
+      IMPORTING
+        date_valid = lv_date
+        time_valid = lv_time ).
+
+    cl_abap_unit_assert=>assert_equals( act = lv_date
+                                        exp = '20250309' ).
+    cl_abap_unit_assert=>assert_equals( act = lv_time
+                                        exp = '033000' ).
+  ENDMETHOD.
+
+  METHOD make_valid_time_no_dst_zone.
+*   JST (Asia/Tokyo) never observes DST, any time should pass through
+    DATA lv_date TYPE d.
+    DATA lv_time TYPE t.
+
+    cl_abap_tstmp=>make_valid_time(
+      EXPORTING
+        date_in    = '20250330'
+        time_in    = '023000'
+        time_zone  = 'JST'
+      IMPORTING
+        date_valid = lv_date
+        time_valid = lv_time ).
+
+    cl_abap_unit_assert=>assert_equals( act = lv_date
+                                        exp = '20250330' ).
+    cl_abap_unit_assert=>assert_equals( act = lv_time
+                                        exp = '023000' ).
+  ENDMETHOD.
+
+  METHOD make_valid_time_gap_before.
+*   CET spring forward: 01:59:59 is the last valid second before the gap
+*   Should pass through unchanged
+    DATA lv_date TYPE d.
+    DATA lv_time TYPE t.
+
+    cl_abap_tstmp=>make_valid_time(
+      EXPORTING
+        date_in    = '20250330'
+        time_in    = '015959'
+        time_zone  = 'CET'
+        mode       = cl_abap_tstmp=>op_mode_before
+      IMPORTING
+        date_valid = lv_date
+        time_valid = lv_time ).
+
+    cl_abap_unit_assert=>assert_equals( act = lv_date
+                                        exp = '20250330' ).
+    cl_abap_unit_assert=>assert_equals( act = lv_time
+                                        exp = '015959' ).
+  ENDMETHOD.
+
+  METHOD make_valid_time_before_est.
+*   EST spring forward 2025-03-09: 02:30 does not exist
+*   op_mode_before -> should give 01:59:59
+    DATA lv_date TYPE d.
+    DATA lv_time TYPE t.
+
+    cl_abap_tstmp=>make_valid_time(
+      EXPORTING
+        date_in    = '20250309'
+        time_in    = '023000'
+        time_zone  = 'EST'
+        mode       = cl_abap_tstmp=>op_mode_before
+      IMPORTING
+        date_valid = lv_date
+        time_valid = lv_time ).
+
+    cl_abap_unit_assert=>assert_equals( act = lv_date
+                                        exp = '20250309' ).
+    cl_abap_unit_assert=>assert_equals( act = lv_time
+                                        exp = '015959' ).
+  ENDMETHOD.
+
+  METHOD tstmp2utclong.
+    CONSTANTS lc_timestamp TYPE timestamp VALUE '20260427123456'.
+    DATA lv_utclong TYPE utclong.
+    DATA lv_result TYPE string.
+
+    lv_utclong = cl_abap_tstmp=>tstmp2utclong( timestamp = lc_timestamp ).
+    lv_result = lv_utclong.
+
+    cl_abap_unit_assert=>assert_equals(
+      act = lv_result
+      exp = '2026-04-27T12:34:56.0000000' ).
+  ENDMETHOD.
+
+  METHOD utclong2tstmp_short.
+    CONSTANTS lc_timestamp TYPE timestamp VALUE '20260427123456'.
+    DATA lv_utclong   TYPE utclong.
+    DATA lv_timestamp TYPE timestamp.
+
+    lv_utclong = cl_abap_tstmp=>tstmp2utclong( timestamp = lc_timestamp ).
+
+    lv_timestamp = cl_abap_tstmp=>utclong2tstmp_short( utclong = lv_utclong ).
+
+    cl_abap_unit_assert=>assert_equals(
+      act = lv_timestamp
+      exp = lc_timestamp ).
+  ENDMETHOD.
+
+  METHOD get_system_timezone.
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_tstmp=>get_system_timezone( )
+      exp = 'UTC' ).
+  ENDMETHOD.
+
+  METHOD syntax1.
+
+    CONVERT DATE sy-datum TIME sy-uzeit
+      INTO TIME STAMP DATA(lv_utc_timestamp) TIME ZONE 'UTC'.
+
+    cl_abap_tstmp=>systemtstmp_utc2syst(
+      EXPORTING
+        utc_tstmp = lv_utc_timestamp
+      IMPORTING
+        syst_date = DATA(lv_utc_issue_date)
+        syst_time = DATA(lv_utc_issue_time) ).
+
+  ENDMETHOD.
+
+ENDCLASS.

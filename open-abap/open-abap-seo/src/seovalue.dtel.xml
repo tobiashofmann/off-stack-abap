@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_DTEL" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <DD04V>
+    <ROLLNAME>SEOVALUE</ROLLNAME>
+    <DDLANGUAGE>E</DDLANGUAGE>
+    <DOMNAME>TEXT132</DOMNAME>
+    <HEADLEN>30</HEADLEN>
+    <SCRLEN1>10</SCRLEN1>
+    <SCRLEN2>15</SCRLEN2>
+    <SCRLEN3>20</SCRLEN3>
+    <DDTEXT>Initial value</DDTEXT>
+    <REPTEXT>Initial value</REPTEXT>
+    <SCRTEXT_S>Initial</SCRTEXT_S>
+    <SCRTEXT_M>Initial value</SCRTEXT_M>
+    <SCRTEXT_L>Initial value</SCRTEXT_L>
+    <DTELMASTER>D</DTELMASTER>
+    <REFKIND>D</REFKIND>
+   </DD04V>
+   <LONGTEXTS>
+    <item>
+     <DOKIL>
+      <ID>DE</ID>
+      <OBJECT>SEOVALUE</OBJECT>
+      <LANGU>D</LANGU>
+      <TYP>E</TYP>
+      <VERSION>0004</VERSION>
+      <MASTERLANG>X</MASTERLANG>
+      <TXTLINES>00004</TXTLINES>
+      <DOKSTATE>A</DOKSTATE>
+     </DOKIL>
+     <HEAD>
+      <TDOBJECT>DOKU</TDOBJECT>
+      <TDNAME>SEOVALUE</TDNAME>
+      <TDID>DE</TDID>
+      <TDSPRAS>D</TDSPRAS>
+      <TDFORM>S_DOCU_SHOW</TDFORM>
+      <TDSTYLE>S_DOCUS1</TDSTYLE>
+      <TDVERSION>00004</TDVERSION>
+      <TDLINESIZE>072</TDLINESIZE>
+     </HEAD>
+     <LINES>
+      <TLINE>
+       <TDFORMAT>U1</TDFORMAT>
+       <TDLINE>&amp;DEFINITION&amp;</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>AS</TDFORMAT>
+       <TDLINE>Der Initialwert legt den Wert fest, den ein</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>&lt;DS:ABEN.CLASS_COMPONENTS&gt;&lt;ZU&gt;&lt;SE&gt;Attribut&lt;/&gt;&lt;/&gt;&lt;/&gt; oder ein</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>&lt;DS:ABEN.METHOD_PARAMETERS&gt;&lt;ZU&gt;&lt;SE&gt;Parameter&lt;/&gt;&lt;/&gt;&lt;/&gt; beim initialen</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>Zugriff besitzt.</TDLINE>
+      </TLINE>
+     </LINES>
+    </item>
+   </LONGTEXTS>
+  </asx:values>
+ </asx:abap>
+</abapGit>

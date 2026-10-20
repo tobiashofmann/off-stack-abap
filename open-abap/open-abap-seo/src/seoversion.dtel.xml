@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_DTEL" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <DD04V>
+    <ROLLNAME>SEOVERSION</ROLLNAME>
+    <DDLANGUAGE>E</DDLANGUAGE>
+    <DOMNAME>SEOVERSION</DOMNAME>
+    <HEADLEN>07</HEADLEN>
+    <SCRLEN1>10</SCRLEN1>
+    <SCRLEN2>15</SCRLEN2>
+    <SCRLEN3>20</SCRLEN3>
+    <DDTEXT>Version indicator (active/inactive)</DDTEXT>
+    <REPTEXT>Version</REPTEXT>
+    <SCRTEXT_S>V</SCRTEXT_S>
+    <SCRTEXT_M>Version</SCRTEXT_M>
+    <SCRTEXT_L>Version</SCRTEXT_L>
+    <DTELMASTER>D</DTELMASTER>
+    <REFKIND>D</REFKIND>
+   </DD04V>
+   <LONGTEXTS>
+    <item>
+     <DOKIL>
+      <ID>DE</ID>
+      <OBJECT>SEOVERSION</OBJECT>
+      <LANGU>D</LANGU>
+      <TYP>E</TYP>
+      <VERSION>0006</VERSION>
+      <MASTERLANG>X</MASTERLANG>
+      <TXTLINES>00012</TXTLINES>
+      <DOKSTATE>A</DOKSTATE>
+     </DOKIL>
+     <HEAD>
+      <TDOBJECT>DOKU</TDOBJECT>
+      <TDNAME>SEOVERSION</TDNAME>
+      <TDID>DE</TDID>
+      <TDSPRAS>D</TDSPRAS>
+      <TDFORM>S_DOCU_SHOW</TDFORM>
+      <TDSTYLE>S_DOCUS1</TDSTYLE>
+      <TDVERSION>00006</TDVERSION>
+      <TDLINESIZE>072</TDLINESIZE>
+     </HEAD>
+     <LINES>
+      <TLINE>
+       <TDFORMAT>U1</TDFORMAT>
+       <TDLINE>&amp;DEFINITION&amp;</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>AS</TDFORMAT>
+       <TDLINE>Das Versionskennzeichen beschreibt den Aktivierungszustand, in dem sich</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>eine &lt;DS:ABEN.CLASSES&gt;&lt;ZU&gt;Klasse&lt;/&gt;&lt;/&gt;, ein</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>&lt;DS:ABEN.INTERFAC&gt;&lt;ZU&gt;Interface&lt;/&gt;&lt;/&gt;, eine</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>&lt;DS:ABEN.CLASS_COMPONENTS&gt;&lt;ZU&gt;&lt;SE&gt;Komponente&lt;/&gt;&lt;/&gt;&lt;/&gt; oder eine</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>Beziehung befindet.</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>AS</TDFORMAT>
+       <TDLINE>Die folgenden Werte sind möglich:</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>B2</TDFORMAT>
+       <TDLINE>&lt;ZH&gt;Aktive Version&lt;/&gt;. Auf diese Version wird zur Laufzeit von allen</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>Verwendern zugegriffen.</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>B2</TDFORMAT>
+       <TDLINE>&lt;ZH&gt;Inaktive Version&lt;/&gt;.</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>AS</TDFORMAT>
+       <TDLINE>Beim Insert von Objekttypen über die Class Libraray API werden alle</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>Objekttypen und deren Komponenten und Beziehungen als inaktive</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>Versionen eingefügt.</TDLINE>
+      </TLINE>
+     </LINES>
+    </item>
+   </LONGTEXTS>
+  </asx:values>
+ </asx:abap>
+</abapGit>

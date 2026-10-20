@@ -1,0 +1,684 @@
+CLASS lcl_dummy DEFINITION.
+ENDCLASS.
+CLASS lcl_dummy IMPLEMENTATION.
+ENDCLASS.
+
+CLASS ltcl_test DEFINITION FOR TESTING RISK LEVEL HARMLESS DURATION SHORT FINAL.
+
+  PRIVATE SECTION.
+    METHODS integer FOR TESTING RAISING cx_static_check.
+    METHODS packed FOR TESTING RAISING cx_static_check.
+    METHODS int8 FOR TESTING RAISING cx_static_check.
+    METHODS numeric FOR TESTING RAISING cx_static_check.
+    METHODS string FOR TESTING RAISING cx_static_check.
+    METHODS abap_bool FOR TESTING RAISING cx_static_check.
+    METHODS generic_data_handle FOR TESTING RAISING cx_static_check.
+    METHODS structure FOR TESTING RAISING cx_static_check.
+    METHODS table FOR TESTING RAISING cx_static_check.
+    METHODS ref FOR TESTING RAISING cx_static_check.
+    METHODS unnamed_type FOR TESTING RAISING cx_static_check.
+    METHODS table_table FOR TESTING RAISING cx_static_check.
+    METHODS numc4 FOR TESTING RAISING cx_static_check.
+    METHODS char5 FOR TESTING RAISING cx_static_check.
+    METHODS hex2 FOR TESTING RAISING cx_static_check.
+    METHODS reference_table FOR TESTING RAISING cx_static_check.
+    METHODS keep_absolute FOR TESTING RAISING cx_static_check.
+    METHODS keep_absolute_struct FOR TESTING RAISING cx_static_check.
+    METHODS packed_qualified_name FOR TESTING RAISING cx_static_check.
+    METHODS int_qualified_name FOR TESTING RAISING cx_static_check.
+    METHODS date_qualified_name FOR TESTING RAISING cx_static_check.
+    METHODS time_qualified_name FOR TESTING RAISING cx_static_check.
+    METHODS hex_qualified_name FOR TESTING RAISING cx_static_check.
+    METHODS numc_qualified_name FOR TESTING RAISING cx_static_check.
+    METHODS decfloat16 FOR TESTING RAISING cx_static_check.
+    METHODS decfloat34 FOR TESTING RAISING cx_static_check.
+
+    METHODS ref_test1 CHANGING foo TYPE REF TO data.
+    METHODS ref_test2 FOR TESTING RAISING cx_static_check.
+    METHODS ref_class FOR TESTING RAISING cx_static_check.
+    METHODS object_class FOR TESTING RAISING cx_static_check.
+
+    METHODS method1 FOR TESTING.
+    METHODS method2 CHANGING data TYPE data.
+    METHODS method3 CHANGING data TYPE data.
+    METHODS method4 CHANGING data TYPE data.
+ENDCLASS.
+
+CLASS ltcl_test IMPLEMENTATION.
+
+  METHOD integer.
+    DATA lo_element TYPE REF TO cl_abap_elemdescr.
+    DATA lo_value_new TYPE REF TO data.
+    FIELD-SYMBOLS <fs_value> TYPE simple.
+
+    lo_element = cl_abap_elemdescr=>get_i( ).
+    CREATE DATA lo_value_new TYPE HANDLE lo_element.
+    ASSIGN lo_value_new->* TO <fs_value>.
+    CLEAR <fs_value>.
+    <fs_value> = 2.
+  ENDMETHOD.
+
+  METHOD packed.
+    DATA lo_element   TYPE REF TO cl_abap_elemdescr.
+    DATA lo_value_new TYPE REF TO data.
+    DATA lv_foo       TYPE p LENGTH 2 DECIMALS 1.
+    FIELD-SYMBOLS <fs_value> TYPE simple.
+
+    lo_element ?= cl_abap_typedescr=>describe_by_data( lv_foo ).
+
+    CREATE DATA lo_value_new TYPE HANDLE lo_element.
+    ASSIGN lo_value_new->* TO <fs_value>.
+    CLEAR <fs_value>.
+    <fs_value> = 2.
+  ENDMETHOD.
+
+  METHOD int8.
+    DATA lo_element   TYPE REF TO cl_abap_elemdescr.
+    DATA lo_value_new TYPE REF TO data.
+    DATA lv_foo       TYPE int8.
+    FIELD-SYMBOLS <fs_value> TYPE simple.
+
+    lo_element ?= cl_abap_typedescr=>describe_by_data( lv_foo ).
+
+    CREATE DATA lo_value_new TYPE HANDLE lo_element.
+    ASSIGN lo_value_new->* TO <fs_value>.
+    CLEAR <fs_value>.
+    <fs_value> = 2.
+  ENDMETHOD.
+
+  METHOD string.
+    DATA lo_element   TYPE REF TO cl_abap_elemdescr.
+    DATA lo_value_new TYPE REF TO data.
+    lo_element = cl_abap_elemdescr=>get_string( ).
+    CREATE DATA lo_value_new TYPE HANDLE lo_element.
+    cl_abap_unit_assert=>assert_bound( lo_value_new ).
+  ENDMETHOD.
+
+  METHOD numeric.
+    DATA lo_element   TYPE REF TO cl_abap_elemdescr.
+    DATA lo_value_new TYPE REF TO data.
+    lo_element = cl_abap_elemdescr=>get_n( 2 ).
+    CREATE DATA lo_value_new TYPE HANDLE lo_element.
+    cl_abap_unit_assert=>assert_bound( lo_value_new ).
+  ENDMETHOD.
+
+  METHOD abap_bool.
+    DATA foo TYPE abap_bool.
+    DATA handle TYPE REF TO cl_abap_typedescr.
+    DATA lo_value_new TYPE REF TO data.
+    handle = cl_abap_typedescr=>describe_by_data( foo ).
+    CREATE DATA lo_value_new TYPE HANDLE handle.
+  ENDMETHOD.
+
+  METHOD generic_data_handle.
+    DATA lr_generic   TYPE REF TO data.
+    DATA lr_created   TYPE REF TO data.
+    DATA lo_refdescr  TYPE REF TO cl_abap_refdescr.
+    DATA lo_datadescr TYPE REF TO cl_abap_datadescr.
+    DATA lv_caught    TYPE abap_bool.
+
+    lo_refdescr ?= cl_abap_typedescr=>describe_by_data( lr_generic ).
+    lo_datadescr ?= lo_refdescr->get_referenced_type( ).
+
+    TRY.
+        CREATE DATA lr_created TYPE HANDLE lo_datadescr.
+      CATCH cx_sy_create_data_error.
+        lv_caught = abap_true.
+    ENDTRY.
+
+    ASSERT lv_caught = abap_true.
+  ENDMETHOD.
+
+  METHOD structure.
+    DATA: BEGIN OF foo,
+        field1 TYPE string,
+        field2 TYPE string,
+      END OF foo.
+    DATA handle TYPE REF TO cl_abap_datadescr.
+    FIELD-SYMBOLS <fs> TYPE any.
+    DATA lo_value_new TYPE REF TO data.
+    handle ?= cl_abap_typedescr=>describe_by_data( foo ).
+    CREATE DATA lo_value_new TYPE HANDLE handle.
+    cl_abap_unit_assert=>assert_bound( lo_value_new ).
+    ASSIGN lo_value_new->* TO <fs>.
+    ASSIGN COMPONENT 'FIELD1' OF STRUCTURE <fs> TO <fs>.
+    cl_abap_unit_assert=>assert_subrc( ).
+  ENDMETHOD.
+
+  METHOD table.
+    DATA foo          TYPE STANDARD TABLE OF i WITH DEFAULT KEY.
+    DATA handle       TYPE REF TO cl_abap_datadescr.
+    DATA lo_value_new TYPE REF TO data.
+
+    handle ?= cl_abap_typedescr=>describe_by_data( foo ).
+    CREATE DATA lo_value_new TYPE HANDLE handle.
+    cl_abap_unit_assert=>assert_bound( lo_value_new ).
+  ENDMETHOD.
+
+  METHOD ref.
+    DATA rr_data TYPE REF TO data.
+    DATA lo_type TYPE REF TO cl_abap_structdescr.
+    DATA lt_comp TYPE cl_abap_structdescr=>component_table.
+    DATA row     LIKE LINE OF lt_comp.
+
+    row-name = 'FOO'.
+    row-type = cl_abap_refdescr=>get_ref_to_data( ).
+    APPEND row TO lt_comp.
+
+    lo_type = cl_abap_structdescr=>create( lt_comp ).
+    CREATE DATA rr_data TYPE HANDLE lo_type.
+  ENDMETHOD.
+
+  METHOD unnamed_type.
+    DATA lo_data  TYPE REF TO data.
+    DATA lo_descr TYPE REF TO cl_abap_typedescr.
+    DATA lv_foo   TYPE c LENGTH 2.
+
+    lo_descr = cl_abap_typedescr=>describe_by_data( lv_foo ).
+* todo,
+*    CREATE DATA lo_data TYPE (lo_descr->absolute_name).
+  ENDMETHOD.
+
+  METHOD table_table.
+    DATA lr_ref TYPE REF TO data.
+    DATA lo_descr TYPE REF TO cl_abap_tabledescr.
+
+    FIELD-SYMBOLS <fs> TYPE ANY TABLE.
+
+    lo_descr = cl_abap_tabledescr=>create( cl_abap_elemdescr=>get_i( ) ).
+    CREATE DATA lr_ref TYPE HANDLE lo_descr.
+    ASSIGN lr_ref->* TO <fs>.
+    INSERT 2 INTO TABLE <fs>.
+    ASSERT lines( <fs> ) = 1.
+  ENDMETHOD.
+
+  METHOD numc4.
+    DATA data    TYPE n LENGTH 4.
+    DATA lr_ref  TYPE REF TO data.
+    DATA type    TYPE REF TO cl_abap_elemdescr.
+    DATA lv_text TYPE c LENGTH 50.
+
+    FIELD-SYMBOLS <fs> TYPE any.
+
+    type ?= cl_abap_typedescr=>describe_by_data( data ).
+    CREATE DATA lr_ref TYPE HANDLE type.
+    ASSIGN lr_ref->* TO <fs>.
+    <fs> = 1.
+    WRITE <fs> TO lv_text.
+    cl_abap_unit_assert=>assert_equals(
+      act = lv_text
+      exp = '0001' ).
+  ENDMETHOD.
+
+  METHOD char5.
+    DATA data    TYPE c LENGTH 5.
+    DATA lr_ref  TYPE REF TO data.
+    DATA type    TYPE REF TO cl_abap_elemdescr.
+    DATA lv_text TYPE c LENGTH 50.
+    FIELD-SYMBOLS <fs> TYPE any.
+
+    type ?= cl_abap_typedescr=>describe_by_data( data ).
+    CREATE DATA lr_ref TYPE HANDLE type.
+    ASSIGN lr_ref->* TO <fs>.
+    <fs> = 'hello world'.
+    WRITE <fs> TO lv_text.
+    cl_abap_unit_assert=>assert_equals(
+      act = lv_text
+      exp = 'hello' ).
+  ENDMETHOD.
+
+  METHOD hex2.
+    DATA data    TYPE x LENGTH 2.
+    DATA lr_ref  TYPE REF TO data.
+    DATA type    TYPE REF TO cl_abap_elemdescr.
+    DATA lv_text TYPE c LENGTH 50.
+    FIELD-SYMBOLS <fs> TYPE any.
+
+    type ?= cl_abap_typedescr=>describe_by_data( data ).
+    CREATE DATA lr_ref TYPE HANDLE type.
+    ASSIGN lr_ref->* TO <fs>.
+    <fs> = '1122334455'.
+    WRITE <fs> TO lv_text.
+    cl_abap_unit_assert=>assert_equals(
+      act = lv_text
+      exp = '1122' ).
+  ENDMETHOD.
+
+  METHOD reference_table.
+
+    DATA: BEGIN OF ls_data,
+            table TYPE REF TO data,
+          END OF ls_data.
+
+    DATA: ls_comp_descr   TYPE abap_componentdescr,
+          lt_comp_descr   TYPE abap_component_tab,
+          lo_table_descr  TYPE REF TO cl_abap_tabledescr,
+          lo_struct_descr TYPE REF TO cl_abap_structdescr.
+
+    FIELD-SYMBOLS <fs> TYPE any.
+
+    ls_comp_descr-name = `FIELD1`.
+    ls_comp_descr-type = cl_abap_elemdescr=>get_string( ).
+    INSERT ls_comp_descr INTO TABLE lt_comp_descr.
+
+    lo_struct_descr = cl_abap_structdescr=>create( lt_comp_descr ).
+    lo_table_descr  = cl_abap_tabledescr=>create( lo_struct_descr ).
+    CREATE DATA ls_data-table TYPE HANDLE lo_table_descr.
+
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_typedescr=>describe_by_data_ref( ls_data-table )->type_kind
+      exp = cl_abap_typedescr=>typekind_table ).
+
+    ASSIGN ls_data-table->* TO <fs>.
+    cl_abap_unit_assert=>assert_subrc( ).
+
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_typedescr=>describe_by_data( <fs> )->type_kind
+      exp = cl_abap_typedescr=>typekind_table ).
+
+  ENDMETHOD.
+
+  METHOD ref_test1.
+    DATA handle TYPE REF TO cl_abap_elemdescr.
+    handle = cl_abap_elemdescr=>get_string( ).
+    CREATE DATA foo TYPE HANDLE handle.
+  ENDMETHOD.
+
+  METHOD ref_test2.
+    DATA bar TYPE REF TO data.
+    FIELD-SYMBOLS <any> TYPE any.
+    ref_test1( CHANGING foo = bar ).
+    ASSIGN bar->* TO <any>.
+    cl_abap_unit_assert=>assert_equals(
+      act = <any>
+      exp = '' ).
+  ENDMETHOD.
+
+  METHOD ref_class.
+    DATA ref TYPE REF TO lcl_dummy.
+    DATA rdata TYPE REF TO data.
+    DATA(lo_handle) = CAST cl_abap_datadescr( cl_abap_typedescr=>describe_by_data( ref ) ).
+    ASSERT lo_handle->kind = cl_abap_typedescr=>kind_ref.
+    ASSERT lo_handle->type_kind = cl_abap_typedescr=>typekind_oref.
+    CREATE DATA rdata TYPE HANDLE lo_handle.
+  ENDMETHOD.
+
+  METHOD object_class.
+    DATA target     TYPE REF TO lcl_dummy.
+    DATA descriptor TYPE REF TO cl_abap_typedescr.
+    DATA type_name  TYPE abap_abstypename.
+
+    CREATE OBJECT target.
+    descriptor = cl_abap_typedescr=>describe_by_object_ref( target ).
+    type_name = descriptor->absolute_name.
+    CLEAR target.
+    CREATE OBJECT target TYPE (type_name).
+    ASSERT target IS BOUND.
+  ENDMETHOD.
+
+  METHOD method1.
+    DATA lr_actual TYPE REF TO data.
+    FIELD-SYMBOLS <any> TYPE any.
+
+    method2( CHANGING data = lr_actual ).
+
+    cl_abap_unit_assert=>assert_not_initial( lr_actual ).
+    ASSIGN lr_actual->* TO <any>.
+    cl_abap_unit_assert=>assert_subrc( ).
+    ASSIGN COMPONENT 'OSYSTEM' OF STRUCTURE <any> TO <any>.
+    cl_abap_unit_assert=>assert_subrc( ).
+    ASSIGN <any>->* TO <any>.
+    cl_abap_unit_assert=>assert_subrc( ).
+  ENDMETHOD.
+
+  METHOD method2.
+    DATA lt_components TYPE cl_abap_structdescr=>component_table.
+    DATA ls_component  LIKE LINE OF lt_components.
+    DATA lo_struct     TYPE REF TO cl_abap_structdescr.
+    FIELD-SYMBOLS <any> TYPE any.
+
+    CLEAR ls_component.
+    ls_component-name = 'OSYSTEM'.
+    ls_component-type = cl_abap_refdescr=>get_ref_to_data( ).
+    APPEND ls_component TO lt_components.
+    lo_struct = cl_abap_structdescr=>create( lt_components ).
+    CREATE DATA data TYPE HANDLE lo_struct.
+
+    ASSIGN data->* TO <any>.
+
+    method3( CHANGING data = <any> ).
+  ENDMETHOD.
+
+  METHOD method3.
+    FIELD-SYMBOLS <any> TYPE any.
+    ASSIGN COMPONENT 'OSYSTEM' OF STRUCTURE data TO <any>.
+
+    method4( CHANGING data = <any> ).
+  ENDMETHOD.
+
+  METHOD method4.
+    DATA lt_components TYPE cl_abap_structdescr=>component_table.
+    DATA ls_component  LIKE LINE OF lt_components.
+    DATA lo_struct     TYPE REF TO cl_abap_structdescr.
+
+    CLEAR ls_component.
+    ls_component-name = 'ID'.
+    ls_component-type = cl_abap_refdescr=>get_ref_to_data( ).
+    APPEND ls_component TO lt_components.
+    lo_struct = cl_abap_structdescr=>create( lt_components ).
+    CREATE DATA data TYPE HANDLE lo_struct.
+  ENDMETHOD.
+
+  METHOD keep_absolute.
+    DATA lo_data  TYPE REF TO data.
+    DATA lo_descr TYPE REF TO cl_abap_datadescr.
+    FIELD-SYMBOLS <any> TYPE any.
+
+    lo_descr ?= cl_abap_typedescr=>describe_by_name( 'ABAP_BOOL' ).
+    CREATE DATA lo_data TYPE HANDLE lo_descr.
+    ASSIGN lo_data->* TO <any>.
+    lo_descr ?= cl_abap_typedescr=>describe_by_data( <any> ).
+    cl_abap_unit_assert=>assert_equals(
+      act = lo_descr->absolute_name
+      exp = '\TYPE-POOL=ABAP\TYPE=ABAP_BOOL' ).
+  ENDMETHOD.
+
+  METHOD keep_absolute_struct.
+    TYPES: BEGIN OF ty,
+             foo TYPE i,
+           END OF ty.
+
+    DATA lo_before TYPE REF TO cl_abap_structdescr.
+    DATA lo_after TYPE REF TO cl_abap_structdescr.
+    DATA lo_tabletype TYPE REF TO cl_abap_tabledescr.
+    DATA tab TYPE STANDARD TABLE OF ty WITH DEFAULT KEY.
+
+    DATA ref TYPE REF TO data.
+    GET REFERENCE OF tab INTO ref.
+
+    lo_tabletype ?= cl_abap_typedescr=>describe_by_data_ref( ref ).
+
+    lo_before ?= lo_tabletype->get_table_line_type( ).
+    cl_abap_unit_assert=>assert_not_initial( lo_before->absolute_name ).
+    cl_abap_unit_assert=>assert_not_initial( lo_before->get_relative_name( ) ).
+
+    CREATE DATA ref TYPE HANDLE lo_before.
+
+    lo_after ?= cl_abap_structdescr=>describe_by_data_ref( ref ).
+    cl_abap_unit_assert=>assert_not_initial( lo_after->absolute_name ).
+    cl_abap_unit_assert=>assert_not_initial( lo_after->get_relative_name( ) ).
+
+    cl_abap_unit_assert=>assert_equals(
+      act = lo_after->absolute_name
+      exp = lo_before->absolute_name ).
+
+    cl_abap_unit_assert=>assert_equals(
+      act = lo_after->get_relative_name( )
+      exp = lo_before->get_relative_name( ) ).
+  ENDMETHOD.
+
+  METHOD int_qualified_name.
+    DATA lo_struct TYPE REF TO cl_abap_structdescr.
+    DATA lo_elem   TYPE REF TO cl_abap_elemdescr.
+    DATA lr_data   TYPE REF TO data.
+
+    TYPES: BEGIN OF ty,
+             subrc TYPE sysubrc,
+           END OF ty.
+
+    FIELD-SYMBOLS <data>  TYPE any.
+    FIELD-SYMBOLS <field> TYPE any.
+
+    lo_struct ?= cl_abap_structdescr=>describe_by_data( VALUE ty( ) ).
+    CREATE DATA lr_data TYPE HANDLE lo_struct.
+    ASSIGN lr_data->* TO <data>.
+    ASSIGN COMPONENT 'SUBRC' OF STRUCTURE <data> TO <field>.
+    lo_elem ?= cl_abap_typedescr=>describe_by_data( <field> ).
+    cl_abap_unit_assert=>assert_equals(
+      act = lo_elem->absolute_name
+      exp = '\TYPE=SYSUBRC' ).
+  ENDMETHOD.
+
+  METHOD date_qualified_name.
+    DATA lo_struct TYPE REF TO cl_abap_structdescr.
+    DATA lo_elem   TYPE REF TO cl_abap_elemdescr.
+    DATA lr_data   TYPE REF TO data.
+
+    TYPES: BEGIN OF ty,
+             datum TYPE sydate,
+           END OF ty.
+
+    FIELD-SYMBOLS <data>  TYPE any.
+    FIELD-SYMBOLS <field> TYPE any.
+
+    lo_struct ?= cl_abap_structdescr=>describe_by_data( VALUE ty( ) ).
+    CREATE DATA lr_data TYPE HANDLE lo_struct.
+    ASSIGN lr_data->* TO <data>.
+    ASSIGN COMPONENT 'DATUM' OF STRUCTURE <data> TO <field>.
+    lo_elem ?= cl_abap_typedescr=>describe_by_data( <field> ).
+    cl_abap_unit_assert=>assert_equals(
+      act = lo_elem->absolute_name
+      exp = '\TYPE=SYDATE' ).
+  ENDMETHOD.
+
+  METHOD time_qualified_name.
+    DATA lo_struct TYPE REF TO cl_abap_structdescr.
+    DATA lo_elem   TYPE REF TO cl_abap_elemdescr.
+    DATA lr_data   TYPE REF TO data.
+
+    TYPES: BEGIN OF ty,
+             uzeit TYPE xsdtime_t,
+           END OF ty.
+
+    FIELD-SYMBOLS <data>  TYPE any.
+    FIELD-SYMBOLS <field> TYPE any.
+
+    lo_struct ?= cl_abap_structdescr=>describe_by_data( VALUE ty( ) ).
+    CREATE DATA lr_data TYPE HANDLE lo_struct.
+    ASSIGN lr_data->* TO <data>.
+    ASSIGN COMPONENT 'UZEIT' OF STRUCTURE <data> TO <field>.
+    lo_elem ?= cl_abap_typedescr=>describe_by_data( <field> ).
+    cl_abap_unit_assert=>assert_equals(
+      act = lo_elem->absolute_name
+      exp = '\TYPE=XSDTIME_T' ).
+  ENDMETHOD.
+
+  METHOD hex_qualified_name.
+    DATA lo_struct TYPE REF TO cl_abap_structdescr.
+    DATA lo_elem   TYPE REF TO cl_abap_elemdescr.
+    DATA lr_data   TYPE REF TO data.
+
+    TYPES: BEGIN OF ty,
+             uuid TYPE sysuuid_x16,
+           END OF ty.
+
+    FIELD-SYMBOLS <data>  TYPE any.
+    FIELD-SYMBOLS <field> TYPE any.
+
+    lo_struct ?= cl_abap_structdescr=>describe_by_data( VALUE ty( ) ).
+    CREATE DATA lr_data TYPE HANDLE lo_struct.
+    ASSIGN lr_data->* TO <data>.
+    ASSIGN COMPONENT 'UUID' OF STRUCTURE <data> TO <field>.
+    lo_elem ?= cl_abap_typedescr=>describe_by_data( <field> ).
+    cl_abap_unit_assert=>assert_equals(
+      act = lo_elem->absolute_name
+      exp = '\TYPE=SYSUUID_X16' ).
+  ENDMETHOD.
+
+  METHOD numc_qualified_name.
+    DATA lo_struct TYPE REF TO cl_abap_structdescr.
+    DATA lo_elem   TYPE REF TO cl_abap_elemdescr.
+    DATA lr_data   TYPE REF TO data.
+
+    TYPES: BEGIN OF ty,
+             mnr TYPE balmnr,
+           END OF ty.
+
+    FIELD-SYMBOLS <data>  TYPE any.
+    FIELD-SYMBOLS <field> TYPE any.
+
+    lo_struct ?= cl_abap_structdescr=>describe_by_data( VALUE ty( ) ).
+    CREATE DATA lr_data TYPE HANDLE lo_struct.
+    ASSIGN lr_data->* TO <data>.
+    ASSIGN COMPONENT 'MNR' OF STRUCTURE <data> TO <field>.
+    lo_elem ?= cl_abap_typedescr=>describe_by_data( <field> ).
+    cl_abap_unit_assert=>assert_equals(
+      act = lo_elem->absolute_name
+      exp = '\TYPE=BALMNR' ).
+  ENDMETHOD.
+
+  METHOD decfloat16.
+    " DATA lo_element   TYPE REF TO cl_abap_elemdescr.
+    " DATA lo_value_new TYPE REF TO data.
+    " DATA lv_foo       TYPE decfloat16.
+    " FIELD-SYMBOLS <fs_value> TYPE simple.
+
+    " lo_element ?= cl_abap_typedescr=>describe_by_data( lv_foo ).
+
+    " CREATE DATA lo_value_new TYPE HANDLE lo_element.
+    " ASSIGN lo_value_new->* TO <fs_value>.
+    " CLEAR <fs_value>.
+    " <fs_value> = 2.
+  ENDMETHOD.
+
+  METHOD decfloat34.
+    DATA lo_element   TYPE REF TO cl_abap_elemdescr.
+    DATA lo_value_new TYPE REF TO data.
+    DATA lv_foo       TYPE decfloat34.
+    FIELD-SYMBOLS <fs_value> TYPE simple.
+
+    lo_element ?= cl_abap_typedescr=>describe_by_data( lv_foo ).
+
+    CREATE DATA lo_value_new TYPE HANDLE lo_element.
+    ASSIGN lo_value_new->* TO <fs_value>.
+    CLEAR <fs_value>.
+    <fs_value> = 2.
+  ENDMETHOD.
+
+  METHOD packed_qualified_name.
+* When kernel_create_data_handle creates a Packed field from an RTTI handle,
+* the qualifiedName (e.g. TIMESTAMPL) must be preserved so that
+* describe_by_data() returns absolute_name = '\TYPE=TIMESTAMPL'
+* instead of a generated placeholder like '\TYPE=%_T00000000000000000000000XX'.
+    DATA lo_struct TYPE REF TO cl_abap_structdescr.
+    DATA lo_elem   TYPE REF TO cl_abap_elemdescr.
+    DATA lr_data   TYPE REF TO data.
+
+    TYPES: BEGIN OF ty_with_timestamp,
+             name          TYPE c LENGTH 20,
+             lastchangedat TYPE timestampl,
+           END OF ty_with_timestamp.
+
+    FIELD-SYMBOLS <data>  TYPE any.
+    FIELD-SYMBOLS <field> TYPE any.
+
+* Get RTTI for the local structure containing a TIMESTAMPL field
+    lo_struct ?= cl_abap_structdescr=>describe_by_data( VALUE ty_with_timestamp( ) ).
+
+* Dynamically create data from the RTTI handle
+* (internally uses kernel_create_data_handle)
+    CREATE DATA lr_data TYPE HANDLE lo_struct.
+
+    ASSIGN lr_data->* TO <data>.
+    ASSIGN COMPONENT 'LASTCHANGEDAT' OF STRUCTURE <data> TO <field>.
+
+* Get RTTI for the dynamically created packed field
+    lo_elem ?= cl_abap_typedescr=>describe_by_data( <field> ).
+
+* absolute_name must be \TYPE=TIMESTAMPL, not a generated \TYPE=%_T...
+    cl_abap_unit_assert=>assert_equals(
+      act = lo_elem->absolute_name
+      exp = '\TYPE=TIMESTAMPL' ).
+  ENDMETHOD.
+
+ENDCLASS.
+
+INTERFACE lif_handle_target.
+ENDINTERFACE.
+
+CLASS lcl_handle_target DEFINITION.
+  PUBLIC SECTION.
+    INTERFACES lif_handle_target.
+ENDCLASS.
+CLASS lcl_handle_target IMPLEMENTATION.
+ENDCLASS.
+
+CLASS lcl_generic_handles DEFINITION.
+  PUBLIC SECTION.
+    METHODS name
+      IMPORTING
+        any_value    TYPE any
+        data_value   TYPE data
+        simple_value TYPE simple
+        clike_value  TYPE clike
+        text         TYPE csequence
+        number       TYPE numeric
+        bytes        TYPE xsequence.
+ENDCLASS.
+CLASS lcl_generic_handles IMPLEMENTATION.
+  METHOD name.
+  ENDMETHOD.
+ENDCLASS.
+
+CLASS ltcl_generic_handles DEFINITION FOR TESTING RISK LEVEL HARMLESS DURATION SHORT FINAL.
+  PRIVATE SECTION.
+    METHODS generic_types_raise FOR TESTING RAISING cx_static_check.
+    METHODS ref_to_interface FOR TESTING RAISING cx_static_check.
+ENDCLASS.
+
+CLASS ltcl_generic_handles IMPLEMENTATION.
+
+  METHOD generic_types_raise.
+    DATA lo_object TYPE REF TO lcl_generic_handles.
+    DATA lo_descr  TYPE REF TO cl_abap_objectdescr.
+    DATA lo_handle TYPE REF TO cl_abap_datadescr.
+    DATA lr_data   TYPE REF TO data.
+    DATA lt_names  TYPE string_table.
+    DATA lv_name   TYPE string.
+    DATA lv_caught TYPE abap_bool.
+
+    APPEND `ANY_VALUE` TO lt_names.
+    APPEND `DATA_VALUE` TO lt_names.
+    APPEND `SIMPLE_VALUE` TO lt_names.
+    APPEND `CLIKE_VALUE` TO lt_names.
+    APPEND `TEXT` TO lt_names.
+    APPEND `NUMBER` TO lt_names.
+    APPEND `BYTES` TO lt_names.
+
+    CREATE OBJECT lo_object.
+    lo_descr ?= cl_abap_typedescr=>describe_by_object_ref( lo_object ).
+
+    LOOP AT lt_names INTO lv_name.
+      lo_handle = lo_descr->get_method_parameter_type(
+        p_method_name    = 'NAME'
+        p_parameter_name = lv_name ).
+      lv_caught = abap_false.
+      TRY.
+          CREATE DATA lr_data TYPE HANDLE lo_handle.
+        CATCH cx_sy_create_data_error.
+          lv_caught = abap_true.
+      ENDTRY.
+      cl_abap_unit_assert=>assert_equals(
+        act = lv_caught
+        exp = abap_true
+        msg = |{ lv_name } is generic| ).
+    ENDLOOP.
+  ENDMETHOD.
+
+  METHOD ref_to_interface.
+    DATA lo_ref    TYPE REF TO lif_handle_target.
+    DATA lo_handle TYPE REF TO cl_abap_datadescr.
+    DATA lr_data   TYPE REF TO data.
+    FIELD-SYMBOLS <lo_target> TYPE REF TO lif_handle_target.
+
+    lo_handle ?= cl_abap_typedescr=>describe_by_data( lo_ref ).
+    CREATE DATA lr_data TYPE HANDLE lo_handle.
+
+    cl_abap_unit_assert=>assert_bound( lr_data ).
+    ASSIGN lr_data->* TO <lo_target>.
+    CREATE OBJECT <lo_target> TYPE lcl_handle_target.
+    cl_abap_unit_assert=>assert_bound( <lo_target> ).
+  ENDMETHOD.
+
+ENDCLASS.
+

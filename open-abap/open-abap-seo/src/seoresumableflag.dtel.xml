@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_DTEL" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <DD04V>
+    <ROLLNAME>SEORESUMABLEFLAG</ROLLNAME>
+    <DDLANGUAGE>E</DDLANGUAGE>
+    <DOMNAME>CHAR1_X</DOMNAME>
+    <HEADLEN>14</HEADLEN>
+    <SCRLEN1>09</SCRLEN1>
+    <SCRLEN2>14</SCRLEN2>
+    <SCRLEN3>14</SCRLEN3>
+    <DDTEXT>Flag that denotes whether an exception is resumable</DDTEXT>
+    <REPTEXT>Resumable flag</REPTEXT>
+    <SCRTEXT_S>Resumable</SCRTEXT_S>
+    <SCRTEXT_M>Resumable flag</SCRTEXT_M>
+    <SCRTEXT_L>Resumable flag</SCRTEXT_L>
+    <DTELMASTER>E</DTELMASTER>
+    <REFKIND>D</REFKIND>
+   </DD04V>
+  </asx:values>
+ </asx:abap>
+</abapGit>

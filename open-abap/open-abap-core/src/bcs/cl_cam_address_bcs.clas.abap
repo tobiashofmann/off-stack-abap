@@ -1,0 +1,49 @@
+CLASS cl_cam_address_bcs DEFINITION PUBLIC.
+  PUBLIC SECTION.
+    INTERFACES if_recipient_bcs.
+    INTERFACES if_sender_bcs.
+
+    CLASS-METHODS create_internet_address
+      IMPORTING
+        i_address_string TYPE clike
+        i_address_name   TYPE clike OPTIONAL
+        i_incl_sapuser   TYPE abap_bool OPTIONAL
+      RETURNING
+        VALUE(result)    TYPE REF TO cl_cam_address_bcs
+      RAISING
+        cx_bcs.
+
+    CLASS-METHODS create_user_home_address
+      IMPORTING
+        i_user        TYPE syuname
+        i_commtype    TYPE any
+      RETURNING
+        VALUE(result) TYPE REF TO cl_cam_address_bcs
+      RAISING
+        cx_bcs.
+
+    CLASS-METHODS create_fax_address
+      IMPORTING
+        i_country     TYPE any
+        i_number      TYPE any
+      RETURNING
+        VALUE(result) TYPE REF TO cl_cam_address_bcs
+      RAISING
+        cx_address_bcs.
+
+ENDCLASS.
+
+CLASS cl_cam_address_bcs IMPLEMENTATION.
+  METHOD create_fax_address.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD create_user_home_address.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD create_internet_address.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+ENDCLASS.

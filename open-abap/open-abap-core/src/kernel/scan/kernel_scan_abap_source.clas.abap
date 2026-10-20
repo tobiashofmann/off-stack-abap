@@ -1,0 +1,270 @@
+CLASS kernel_scan_abap_source DEFINITION PUBLIC.
+* handling of ABAP statement SCAN ABAP-SOURCE
+  PUBLIC SECTION.
+    CLASS-METHODS call IMPORTING input TYPE any.
+  PRIVATE SECTION.
+    TYPES ty_stokesx TYPE STANDARD TABLE OF stokesx WITH DEFAULT KEY.
+    TYPES ty_sstmnt TYPE STANDARD TABLE OF sstmnt WITH DEFAULT KEY.
+
+    CLASS-METHODS call_internal
+      IMPORTING
+        source     TYPE string
+      EXPORTING
+        et_stokesx TYPE ty_stokesx
+        et_sstmnt  TYPE ty_sstmnt.
+
+    CONSTANTS: BEGIN OF gc_token,
+                 comment    TYPE c LENGTH 1 VALUE 'C',
+                 identifier TYPE c LENGTH 1 VALUE 'I',
+                 list       TYPE c LENGTH 1 VALUE 'L',
+                 literal    TYPE c LENGTH 1 VALUE 'S',
+                 pragma     TYPE c LENGTH 1 VALUE 'P',
+               END OF gc_token.
+
+    CONSTANTS: BEGIN OF gc_statement,
+                 comment          TYPE c LENGTH 1 VALUE 'P',
+                 comment_in_stmnt TYPE c LENGTH 1 VALUE 'S',
+                 compute_direct   TYPE c LENGTH 1 VALUE 'C',
+                 empty            TYPE c LENGTH 1 VALUE 'N',
+                 macro_call       TYPE c LENGTH 1 VALUE 'D',
+                 macro_definition TYPE c LENGTH 1 VALUE 'M',
+                 method_direct    TYPE c LENGTH 1 VALUE 'A',
+                 native_sql       TYPE c LENGTH 1 VALUE 'E',
+                 pragma           TYPE c LENGTH 1 VALUE 'G',
+                 standard         TYPE c LENGTH 1 VALUE 'K',
+               END OF gc_statement.
+
+    CLASS-METHODS pass1
+      EXPORTING
+        et_tokens     TYPE ty_stokesx
+        et_statements TYPE ty_sstmnt
+      CHANGING
+        source        TYPE string.
+
+    CLASS-METHODS pass2
+      CHANGING
+        ct_tokens     TYPE ty_stokesx
+        ct_statements TYPE ty_sstmnt.
+ENDCLASS.
+
+CLASS kernel_scan_abap_source IMPLEMENTATION.
+
+  METHOD call.
+
+* non-goal: good performance
+
+    DATA lt_sstmnt  TYPE ty_sstmnt.
+    DATA lt_stokes  TYPE stokes_tab.
+    DATA ls_stokes  LIKE LINE OF lt_stokes.
+    DATA lt_stokesx TYPE ty_stokesx.
+    DATA ls_stokesx LIKE LINE OF lt_stokesx.
+    DATA lv_source  TYPE string.
+    DATA lt_levels TYPE slevel_tab.
+    DATA lt_structures TYPE sstruc_tab.
+
+    WRITE '@KERNEL lv_source.set(INPUT.scan_abap_source.array ? INPUT.scan_abap_source.array().map(e => e.get()).join("\n") : INPUT.scan_abap_source.get());'.
+
+    call_internal(
+      EXPORTING
+        source     = lv_source
+      IMPORTING
+        et_stokesx = lt_stokesx
+        et_sstmnt  = lt_sstmnt ).
+
+    LOOP AT lt_stokesx INTO ls_stokesx.
+      CLEAR ls_stokes.
+      MOVE-CORRESPONDING ls_stokesx TO ls_stokes.
+      APPEND ls_stokes TO lt_stokes.
+    ENDLOOP.
+
+    WRITE '@KERNEL const len = Object.keys(INPUT.tokens_into.getRowType().get()).length;'.
+    WRITE '@KERNEL INPUT.tokens_into.set(len == 4 ? lt_stokes : lt_stokesx);'.
+
+    WRITE '@KERNEL INPUT.statements_into.set(lt_sstmnt);'.
+
+    INSERT VALUE #(
+      depth = 1
+      from  = 1
+      to    = 1
+      type  = 'P' ) INTO TABLE lt_levels.
+    WRITE '@KERNEL INPUT.levels_into?.set(lt_levels);'.
+
+    INSERT VALUE #(
+       type       = 'P'
+       stmnt_type = '?'
+       stmnt_from = 1
+       stmnt_to   = 1
+       struc_from = 3
+       struc_to   = 2 ) INTO TABLE lt_structures.
+    WRITE '@KERNEL INPUT.structures_into?.set(lt_structures);'.
+
+  ENDMETHOD.
+
+  METHOD call_internal.
+
+* build tokens in sequence of occurence in the source
+* take care of chained statements
+    pass1(
+      IMPORTING
+        et_tokens     = et_stokesx
+        et_statements = et_sstmnt
+      CHANGING
+        source        = source ).
+
+* move comment tokens and add/change statements to comment type
+    pass2(
+      CHANGING
+        ct_tokens     = et_stokesx
+        ct_statements = et_sstmnt ).
+
+  ENDMETHOD.
+
+  METHOD pass1.
+    CONSTANTS: BEGIN OF c_mode,
+                 normal  TYPE i VALUE 1,
+                 comment TYPE i VALUE 2,
+               END OF c_mode.
+
+    DATA character    TYPE c LENGTH 1.
+    DATA row          TYPE i VALUE 1.
+    DATA column       TYPE i.
+    DATA index        TYPE i.
+    DATA sfrom        TYPE i VALUE 1.
+    DATA mode         TYPE i.
+    DATA chain_tokens TYPE ty_stokesx.
+
+    FIELD-SYMBOLS <trow> LIKE LINE OF et_tokens.
+    FIELD-SYMBOLS <srow> LIKE LINE OF et_statements.
+
+    mode = c_mode-normal.
+    WHILE source IS NOT INITIAL.
+      character = source(1).
+      source = source+1.
+
+      IF <trow> IS NOT ASSIGNED AND character <> '' AND character <> |\n|.
+        APPEND INITIAL LINE TO et_tokens ASSIGNING <trow>.
+        <trow>-row = row.
+        <trow>-col = column.
+        <trow>-type = gc_token-identifier.
+      ELSEIF mode = c_mode-normal AND ( character = '' OR character CA |.,| ).
+        UNASSIGN <trow>.
+"         IF character = ','.
+" *          WRITE '@KERNEL console.dir("before");'.
+"           APPEND LINES OF chain_tokens TO et_tokens.
+" *          WRITE '@KERNEL console.dir("after");'.
+" *          WRITE lines( <tokens> ).
+"         ENDIF.
+      ELSEIF mode = c_mode-normal AND character = ':'.
+        CLEAR chain_tokens.
+        APPEND LINES OF et_tokens FROM sfrom TO chain_tokens.
+        DELETE chain_tokens WHERE type = gc_token-comment.
+*        WRITE '@KERNEL console.dir(chain_tokens);'.
+      ENDIF.
+
+      IF ( mode = c_mode-normal AND character CA |.,| )
+          OR source = ''.
+        APPEND INITIAL LINE TO et_statements ASSIGNING <srow>.
+        <srow>-terminator = character.
+        <srow>-from = sfrom.
+        <srow>-to = lines( et_tokens ).
+        sfrom = <srow>-to + 1.
+
+        IF character = ','.
+*          WRITE '@KERNEL console.dir("before");'.
+          APPEND LINES OF chain_tokens TO et_tokens.
+*          WRITE '@KERNEL console.dir("after");'.
+*          WRITE lines( <tokens> ).
+        ENDIF.
+      ENDIF.
+
+      IF character = |\n|.
+        mode = c_mode-normal.
+        UNASSIGN <trow>.
+        row = row + 1.
+        column = 0.
+      ELSE.
+        IF <trow> IS ASSIGNED.
+          IF ( character = '*' AND column = 0 ) OR character = '"'.
+            mode = c_mode-comment.
+            <trow>-type = gc_token-comment.
+          ENDIF.
+          IF mode = c_mode-comment.
+            <trow>-type = gc_token-comment.
+            CONCATENATE <trow>-str character INTO <trow>-str RESPECTING BLANKS.
+          ELSEIF character <> ':'.
+            <trow>-str = <trow>-str && to_upper( |{ character }| ).
+          ENDIF.
+        ENDIF.
+        column = column + 1.
+      ENDIF.
+
+    ENDWHILE.
+
+  ENDMETHOD.
+
+  METHOD pass2.
+    FIELD-SYMBOLS <ls_statement> LIKE LINE OF ct_statements.
+    DATA ls_statement       LIKE LINE OF ct_statements.
+    DATA ls_token           LIKE LINE OF ct_tokens.
+    DATA contains_comment   TYPE abap_bool.
+    DATA contains_normal    TYPE abap_bool.
+    DATA lv_count           TYPE i.
+    DATA lv_statement_index TYPE i.
+    DATA lt_insert          LIKE ct_tokens.
+    DATA lt_delete          TYPE STANDARD TABLE OF i WITH DEFAULT KEY.
+    DATA lv_index           LIKE LINE OF lt_delete.
+
+    LOOP AT ct_statements ASSIGNING <ls_statement>.
+      lv_statement_index = sy-tabix.
+
+*      WRITE '@KERNEL console.dir("statement");'.
+      contains_comment = abap_false.
+      contains_normal = abap_false.
+      LOOP AT ct_tokens INTO ls_token FROM <ls_statement>-from TO <ls_statement>-to.
+        IF ls_token-type = gc_token-comment.
+          contains_comment = abap_true.
+        ELSE.
+          contains_normal = abap_true.
+        ENDIF.
+*        WRITE '@KERNEL console.dir(ls_token.get().str.get());'.
+      ENDLOOP.
+
+      IF contains_comment = abap_true AND contains_normal = abap_true.
+* its a mix, move comments to the front as separate statement
+*        WRITE '@KERNEL console.dir("from: " + fs_ls_statement_.get().from.get());'.
+*        WRITE '@KERNEL console.dir("to: " + fs_ls_statement_.get().to.get());'.
+        lv_count = 0.
+        CLEAR lt_insert.
+        CLEAR lt_delete.
+        LOOP AT ct_tokens INTO ls_token FROM <ls_statement>-from TO <ls_statement>-to.
+*          WRITE '@KERNEL console.dir("token: " + ls_token.get().str.get() + " " + abap.builtin.sy.get().tabix.get());'.
+          IF ls_token-type = gc_token-comment.
+            INSERT sy-tabix INTO lt_delete INDEX 1.
+            INSERT ls_token INTO lt_insert INDEX 1.
+            lv_count = lv_count + 1.
+          ENDIF.
+        ENDLOOP.
+        LOOP AT lt_delete INTO lv_index.
+          DELETE ct_tokens INDEX lv_index.
+        ENDLOOP.
+        LOOP AT lt_insert INTO ls_token.
+          INSERT ls_token INTO ct_tokens INDEX <ls_statement>-from.
+        ENDLOOP.
+
+        CLEAR ls_statement.
+        ls_statement-from = <ls_statement>-from.
+        ls_statement-to = <ls_statement>-from + lv_count - 1.
+        ls_statement-type = gc_statement-comment.
+
+        <ls_statement>-from = <ls_statement>-from + lv_count.
+
+        INSERT ls_statement INTO ct_statements INDEX lv_statement_index.
+      ELSEIF contains_comment = abap_true.
+        <ls_statement>-type = gc_statement-comment.
+      ELSE.
+        <ls_statement>-type = gc_statement-standard.
+      ENDIF.
+    ENDLOOP.
+  ENDMETHOD.
+
+ENDCLASS.

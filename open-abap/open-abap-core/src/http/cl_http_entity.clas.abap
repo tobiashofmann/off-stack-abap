@@ -1,0 +1,326 @@
+CLASS cl_http_entity DEFINITION PUBLIC CREATE PUBLIC FRIENDS cl_http_client.
+  PUBLIC SECTION.
+    INTERFACES if_http_response.
+    INTERFACES if_http_request.
+
+    ALIASES set_header_field FOR if_http_entity~set_header_field.
+    ALIASES append_cdata FOR if_http_entity~append_cdata.
+    ALIASES get_cdata FOR if_http_entity~get_cdata.
+    ALIASES set_cdata FOR if_http_entity~set_cdata.
+    ALIASES get_header_field FOR if_http_entity~get_header_field.
+    ALIASES set_header_field FOR if_http_entity~set_header_field.
+*  PROTECTED SECTION.
+    DATA m_last_error TYPE i.
+*  PRIVATE SECTION. todo
+    DATA mv_status       TYPE i.
+    DATA mv_reason       TYPE string.
+    DATA mv_content_type TYPE string.
+    DATA mv_method       TYPE string.
+    DATA mv_data         TYPE xstring.
+    DATA mt_headers      TYPE tihttpnvp.
+    DATA mt_form_fields  TYPE tihttpnvp.
+ENDCLASS.
+
+CLASS cl_http_entity IMPLEMENTATION.
+
+  METHOD if_http_response~server_cache_expire_rel.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_response~server_cache_expire_default.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_response~server_cache_expire_abs.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_response~server_cache_browser_dependent.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_response~get_raw_message.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_response~copy.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_request~get_user_agent.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_request~get_uri_parameter.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_request~get_raw_message.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_request~get_form_data.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_request~get_authorization.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_request~copy.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_request~set_authorization.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_entity~add_multipart.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_entity~get_cookie_field.
+* todo
+    CLEAR field_value.
+  ENDMETHOD.
+
+  METHOD if_http_entity~set_compression.
+* todo
+  ENDMETHOD.
+
+  METHOD if_http_entity~append_cdata.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_entity~append_cdata2.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_entity~add_cookie_field.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_entity~append_data.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_entity~to_xstring.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_entity~delete_cookie_secure.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_entity~get_cookies.
+* todo
+    CLEAR cookies.
+  ENDMETHOD.
+
+  METHOD if_http_entity~delete_form_field.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_entity~delete_form_field_secure.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_entity~get_cookie.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_entity~get_data_length.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_entity~from_xstring.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_entity~get_form_field_cs.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_entity~get_last_error.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_entity~delete_header_field.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_entity~delete_header_field_secure.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_entity~delete_cookie.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_entity~set_header_fields.
+* todo, does this method clear the existing fields?
+    DATA ls_field LIKE LINE OF fields.
+    LOOP AT fields INTO ls_field.
+      if_http_entity~set_header_field(
+        name  = ls_field-name
+        value = ls_field-value ).
+    ENDLOOP.
+  ENDMETHOD.
+
+  METHOD if_http_entity~suppress_content_type.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_entity~set_formfield_encoding.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_entity~set_cookie.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_entity~get_version.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_entity~get_serialized_message_length.
+    ASSERT 1 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_entity~get_header_field.
+    DATA ls_header LIKE LINE OF mt_headers.
+    READ TABLE mt_headers WITH KEY name = to_lower( name ) INTO ls_header.
+    IF sy-subrc = 0.
+      value = ls_header-value.
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD if_http_entity~get_header_fields.
+    fields = mt_headers.
+  ENDMETHOD.
+
+  METHOD if_http_response~get_status.
+    code = mv_status.
+    reason = mv_reason.
+  ENDMETHOD.
+
+  METHOD if_http_entity~get_cdata.
+    cl_abap_conv_in_ce=>create( encoding = 'UTF-8' )->convert(
+      EXPORTING input = mv_data
+      IMPORTING data  = data ).
+  ENDMETHOD.
+
+  METHOD if_http_response~set_status.
+    mv_status = code.
+    mv_reason = reason.
+  ENDMETHOD.
+
+  METHOD if_http_entity~set_cdata.
+    cl_abap_conv_out_ce=>create( encoding = 'UTF-8' )->convert(
+      EXPORTING data   = data
+      IMPORTING buffer = mv_data ).
+  ENDMETHOD.
+
+  METHOD if_http_entity~get_content_type.
+    content_type = if_http_entity~get_header_field( 'content-type' ).
+  ENDMETHOD.
+
+  METHOD if_http_entity~set_content_type.
+    if_http_entity~set_header_field(
+      name  = 'content-type'
+      value = content_type ).
+  ENDMETHOD.
+
+  METHOD if_http_entity~get_data.
+    data = mv_data.
+  ENDMETHOD.
+
+  METHOD if_http_entity~set_data.
+    mv_data = data.
+  ENDMETHOD.
+
+  METHOD if_http_response~delete_cookie_at_client.
+    ASSERT 2 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_response~redirect.
+    ASSERT 2 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_entity~num_multiparts.
+* todo
+    num = 0.
+  ENDMETHOD.
+
+  METHOD if_http_entity~get_multipart.
+    ASSERT 2 = 'todo'.
+  ENDMETHOD.
+
+  METHOD if_http_entity~get_form_fields_cs.
+    fields = mt_form_fields.
+  ENDMETHOD.
+
+  METHOD if_http_entity~set_form_fields.
+    mt_form_fields = fields.
+  ENDMETHOD.
+
+  METHOD if_http_entity~get_form_fields.
+    DATA ls_field LIKE LINE OF mt_form_fields.
+    LOOP AT mt_form_fields INTO ls_field.
+      TRANSLATE ls_field-name TO LOWER CASE.
+      APPEND ls_field TO fields.
+    ENDLOOP.
+  ENDMETHOD.
+
+  METHOD if_http_entity~get_form_field.
+* the name is compared case insensitively on both sides: the setters store
+* the name as given, so lower casing only the name asked for made a field
+* whose name is not already lower case unreachable by any spelling
+    DATA ls_field LIKE LINE OF mt_form_fields.
+    DATA lv_name TYPE string.
+    lv_name = to_lower( name ).
+    LOOP AT mt_form_fields INTO ls_field.
+      IF to_lower( ls_field-name ) = lv_name.
+        value = ls_field-value.
+        RETURN.
+      ENDIF.
+    ENDLOOP.
+  ENDMETHOD.
+
+  METHOD if_http_entity~set_header_field.
+    DATA ls_header LIKE LINE OF mt_headers.
+    FIELD-SYMBOLS <ls_header> LIKE LINE OF mt_headers.
+    READ TABLE mt_headers WITH KEY name = to_lower( name ) ASSIGNING <ls_header>.
+    IF sy-subrc = 0.
+      <ls_header>-value = value.
+    ELSE.
+      ls_header-name = to_lower( name ).
+      ls_header-value = value.
+      APPEND ls_header TO mt_headers.
+    ENDIF.
+    IF name = '~request_method'.
+      if_http_request~set_method( value ).
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD if_http_request~set_method.
+    mv_method = method.
+  ENDMETHOD.
+
+  METHOD if_http_request~get_method.
+    meth = mv_method.
+  ENDMETHOD.
+
+  METHOD if_http_request~set_version.
+* todo,
+    RETURN.
+  ENDMETHOD.
+
+  METHOD if_http_entity~set_form_field.
+    DATA ls_field LIKE LINE OF mt_form_fields.
+    ls_field-name = name.
+    ls_field-value = value.
+    APPEND ls_field TO mt_form_fields.
+  ENDMETHOD.
+
+ENDCLASS.

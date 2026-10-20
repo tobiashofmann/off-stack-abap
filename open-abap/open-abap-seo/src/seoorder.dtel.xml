@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_DTEL" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <DD04V>
+    <ROLLNAME>SEOORDER</ROLLNAME>
+    <DDLANGUAGE>E</DDLANGUAGE>
+    <DDTEXT>Editing Order</DDTEXT>
+    <DTELMASTER>D</DTELMASTER>
+    <DATATYPE>INT4</DATATYPE>
+    <LENG>000010</LENG>
+    <OUTPUTLEN>000011</OUTPUTLEN>
+   </DD04V>
+   <LONGTEXTS>
+    <item>
+     <DOKIL>
+      <ID>DE</ID>
+      <OBJECT>SEOORDER</OBJECT>
+      <LANGU>D</LANGU>
+      <TYP>E</TYP>
+      <VERSION>0004</VERSION>
+      <MASTERLANG>X</MASTERLANG>
+      <TXTLINES>00006</TXTLINES>
+      <DOKSTATE>A</DOKSTATE>
+     </DOKIL>
+     <HEAD>
+      <TDOBJECT>DOKU</TDOBJECT>
+      <TDNAME>SEOORDER</TDNAME>
+      <TDID>DE</TDID>
+      <TDSPRAS>D</TDSPRAS>
+      <TDFORM>S_DOCU_SHOW</TDFORM>
+      <TDSTYLE>S_DOCUS1</TDSTYLE>
+      <TDVERSION>00004</TDVERSION>
+      <TDLINESIZE>072</TDLINESIZE>
+     </HEAD>
+     <LINES>
+      <TLINE>
+       <TDFORMAT>U1</TDFORMAT>
+       <TDLINE>&amp;DEFINITION&amp;</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>AS</TDFORMAT>
+       <TDLINE>Die Editierreihenfolge legt fest, an welcher Position eine</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>&lt;DS:ABEN.CLASS_COMPONENTS&gt;&lt;ZU&gt;&lt;SE&gt;Komponente&lt;/&gt;&lt;/&gt;&lt;/&gt; im Class Builder</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>angezeigt wird (Sortierung) und an welcher Position die Komponente im</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>generierten Coding des Class Pools erscheint.</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>AS</TDFORMAT>
+       <TDLINE>Das Ergebnis der Syntaxprüfung des Class Pools kann deshalb von der</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>Editierreihenfolge abhängen.</TDLINE>
+      </TLINE>
+     </LINES>
+    </item>
+   </LONGTEXTS>
+  </asx:values>
+ </asx:abap>
+</abapGit>

@@ -1,0 +1,449 @@
+CLASS ltcl_dyn_prg DEFINITION FOR TESTING RISK LEVEL HARMLESS DURATION SHORT FINAL.
+
+  PRIVATE SECTION.
+    METHODS escape_quotes1 FOR TESTING RAISING cx_static_check.
+    METHODS escape_quotes_str1 FOR TESTING RAISING cx_static_check.
+    METHODS escape_xss_url_simple FOR TESTING RAISING cx_static_check.
+    METHODS escape_xss_url_special FOR TESTING RAISING cx_static_check.
+    METHODS escape_xss_url_script FOR TESTING RAISING cx_static_check.
+    METHODS escape_xss_url_empty FOR TESTING RAISING cx_static_check.
+    METHODS quote_simple FOR TESTING RAISING cx_static_check.
+    METHODS quote_with_quotes FOR TESTING RAISING cx_static_check.
+    METHODS quote_empty FOR TESTING RAISING cx_static_check.
+    METHODS escape_xss_xml_html_simple FOR TESTING RAISING cx_static_check.
+    METHODS escape_xss_xml_html_special FOR TESTING RAISING cx_static_check.
+    METHODS escape_xss_xml_html_script FOR TESTING RAISING cx_static_check.
+    METHODS escape_xss_xml_html_empty FOR TESTING RAISING cx_static_check.
+    METHODS escape_xss_xml_html_quotes FOR TESTING RAISING cx_static_check.
+    METHODS escape_xss_url_spaces FOR TESTING RAISING cx_static_check.
+    METHODS escape_xss_url_percent FOR TESTING RAISING cx_static_check.
+    METHODS escape_xss_url_trailing_space FOR TESTING RAISING cx_static_check.
+    METHODS escape_xss_url_special_chars FOR TESTING RAISING cx_static_check.
+    METHODS escape_quotes_multiple FOR TESTING RAISING cx_static_check.
+    METHODS escape_quotes_empty FOR TESTING RAISING cx_static_check.
+    METHODS escape_quotes_str_empty FOR TESTING RAISING cx_static_check.
+    METHODS escape_xss_xml_html_newline FOR TESTING RAISING cx_static_check.
+    METHODS escape_xss_xml_html_tab FOR TESTING RAISING cx_static_check.
+    METHODS check_table_or_view_name FOR TESTING RAISING cx_static_check.
+    METHODS check_table_or_view_lower FOR TESTING RAISING cx_static_check.
+    METHODS check_table_or_view_namespace FOR TESTING RAISING cx_static_check.
+    METHODS check_table_or_view_invalid FOR TESTING RAISING cx_static_check.
+    METHODS check_table_or_view_empty FOR TESTING RAISING cx_static_check.
+    METHODS check_table_or_view_too_long FOR TESTING RAISING cx_static_check.
+    METHODS check_column_name_simple FOR TESTING RAISING cx_static_check.
+    METHODS check_column_name_underscore FOR TESTING RAISING cx_static_check.
+    METHODS check_column_name_namespace FOR TESTING RAISING cx_static_check.
+    METHODS check_column_name_qualified FOR TESTING RAISING cx_static_check.
+    METHODS check_column_name_strict FOR TESTING RAISING cx_static_check.
+    METHODS check_column_name_invalid FOR TESTING RAISING cx_static_check.
+    METHODS check_column_name_empty FOR TESTING RAISING cx_static_check.
+    METHODS check_table_name_known FOR TESTING RAISING cx_static_check.
+    METHODS check_table_name_lower FOR TESTING RAISING cx_static_check.
+    METHODS check_table_name_unknown FOR TESTING RAISING cx_static_check.
+    METHODS check_table_name_invalid FOR TESTING RAISING cx_static_check.
+
+ENDCLASS.
+
+CLASS ltcl_dyn_prg IMPLEMENTATION.
+  METHOD escape_quotes_str1.
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>escape_quotes_str( 'hello ` world' )
+      exp = 'hello `` world' ).
+  ENDMETHOD.
+
+  METHOD escape_quotes1.
+
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>escape_quotes( `hello ' world` )
+      exp = `hello '' world` ).
+
+  ENDMETHOD.
+
+  METHOD escape_xss_url_simple.
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>escape_xss_url( 'hello' )
+      exp = 'hello' ).
+  ENDMETHOD.
+
+  METHOD escape_xss_url_special.
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>escape_xss_url( 'a<b>c"d' )
+      exp = 'a%3cb%3ec%22d' ).
+  ENDMETHOD.
+
+  METHOD escape_xss_url_script.
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>escape_xss_url( '<script>alert(1)</script>' )
+      exp = '%3cscript%3ealert%281%29%3c%2fscript%3e' ).
+  ENDMETHOD.
+
+  METHOD escape_xss_url_empty.
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>escape_xss_url( '' )
+      exp = '' ).
+  ENDMETHOD.
+
+  METHOD quote_simple.
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>quote( 'hello' )
+      exp = `'hello'` ).
+  ENDMETHOD.
+
+  METHOD quote_with_quotes.
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>quote( `it's a test` )
+      exp = `'it''s a test'` ).
+  ENDMETHOD.
+
+  METHOD quote_empty.
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>quote( '' )
+      exp = `''` ).
+  ENDMETHOD.
+
+  METHOD escape_xss_xml_html_simple.
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>escape_xss_xml_html( 'hello' )
+      exp = 'hello' ).
+  ENDMETHOD.
+
+  METHOD escape_xss_xml_html_special.
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>escape_xss_xml_html( 'a<b>c"d&e' )
+      exp = 'a&lt;b&gt;c&#x22;d&amp;e' ).
+  ENDMETHOD.
+
+  METHOD escape_xss_xml_html_script.
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>escape_xss_xml_html( '<script>alert(1)</script>' )
+      exp = '&lt;script&gt;alert&#x28;1&#x29;&lt;&#x2f;script&gt;' ).
+  ENDMETHOD.
+
+  METHOD escape_xss_xml_html_empty.
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>escape_xss_xml_html( '' )
+      exp = '' ).
+  ENDMETHOD.
+
+  METHOD escape_xss_xml_html_quotes.
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>escape_xss_xml_html( `it's a "test"` )
+      exp = `it&#x27;s&#x20;a&#x20;&#x22;test&#x22;` ).
+  ENDMETHOD.
+
+  METHOD escape_xss_url_spaces.
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>escape_xss_url( 'hello world' )
+      exp = 'hello%20world' ).
+  ENDMETHOD.
+
+  METHOD escape_xss_url_percent.
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>escape_xss_url( '100%' )
+      exp = '100%25' ).
+  ENDMETHOD.
+
+  METHOD escape_xss_url_trailing_space.
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>escape_xss_url( 'hello ' )
+      exp = 'hello' ).
+  ENDMETHOD.
+
+  METHOD escape_xss_url_special_chars.
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>escape_xss_url( '!''()*' )
+      exp = '%21%27%28%29*' ).
+  ENDMETHOD.
+
+  METHOD escape_quotes_multiple.
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>escape_quotes( `a''b` )
+      exp = `a''''b` ).
+  ENDMETHOD.
+
+  METHOD escape_quotes_empty.
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>escape_quotes( '' )
+      exp = '' ).
+  ENDMETHOD.
+
+  METHOD escape_quotes_str_empty.
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>escape_quotes_str( '' )
+      exp = '' ).
+  ENDMETHOD.
+
+  METHOD escape_xss_xml_html_newline.
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>escape_xss_xml_html( |a{ cl_abap_char_utilities=>newline }b| )
+      exp = 'a&#xa;b' ).
+  ENDMETHOD.
+
+  METHOD escape_xss_xml_html_tab.
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>escape_xss_xml_html( |a{ cl_abap_char_utilities=>horizontal_tab }b| )
+      exp = 'a&#x9;b' ).
+  ENDMETHOD.
+
+  METHOD check_table_name_known.
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>check_table_name_str(
+        val      = 'T000'
+        packages = '' )
+      exp = 'T000' ).
+  ENDMETHOD.
+
+  METHOD check_table_name_lower.
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>check_table_name_str(
+        val      = 't000'
+        packages = '' )
+      exp = 't000' ).
+  ENDMETHOD.
+
+  METHOD check_table_name_unknown.
+    TRY.
+        cl_abap_dyn_prg=>check_table_name_str(
+          val      = 'ZNOT_A_TABLE'
+          packages = '' ).
+        cl_abap_unit_assert=>fail( ).
+      CATCH cx_abap_not_a_table.
+        " expected
+    ENDTRY.
+  ENDMETHOD.
+
+  METHOD check_table_name_invalid.
+    TRY.
+        cl_abap_dyn_prg=>check_table_name_str(
+          val      = 'T000; DROP TABLE'
+          packages = '' ).
+        cl_abap_unit_assert=>fail( ).
+      CATCH cx_abap_not_a_table.
+        " expected
+    ENDTRY.
+  ENDMETHOD.
+
+  METHOD check_table_or_view_name.
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>check_table_or_view_name_str(
+        val      = 'T000'
+        packages = '' )
+      exp = 'T000' ).
+  ENDMETHOD.
+
+  METHOD check_table_or_view_lower.
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>check_table_or_view_name_str(
+        val      = 'zflight_view'
+        packages = '' )
+      exp = 'zflight_view' ).
+  ENDMETHOD.
+
+  METHOD check_table_or_view_namespace.
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>check_table_or_view_name_str(
+        val      = '/DMO/FLIGHT'
+        packages = '' )
+      exp = '/DMO/FLIGHT' ).
+  ENDMETHOD.
+
+  METHOD check_table_or_view_invalid.
+    TRY.
+        cl_abap_dyn_prg=>check_table_or_view_name_str(
+          val      = 'T000 WHERE MANDT = 100'
+          packages = '' ).
+        cl_abap_unit_assert=>fail( ).
+      CATCH cx_abap_not_a_table.
+    ENDTRY.
+  ENDMETHOD.
+
+  METHOD check_table_or_view_empty.
+    TRY.
+        cl_abap_dyn_prg=>check_table_or_view_name_str(
+          val      = ''
+          packages = '' ).
+        cl_abap_unit_assert=>fail( ).
+      CATCH cx_abap_not_a_table.
+    ENDTRY.
+  ENDMETHOD.
+
+  METHOD check_table_or_view_too_long.
+    TRY.
+        cl_abap_dyn_prg=>check_table_or_view_name_str(
+          val      = 'ABCDEFGHIJKLMNOPQRSTUVWXYZABCDE'
+          packages = '' ).
+        cl_abap_unit_assert=>fail( ).
+      CATCH cx_abap_not_a_table.
+    ENDTRY.
+  ENDMETHOD.
+
+  METHOD check_column_name_simple.
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>check_column_name( 'MANDT' )
+      exp = 'MANDT' ).
+  ENDMETHOD.
+
+  METHOD check_column_name_underscore.
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>check_column_name( 'created_by' )
+      exp = 'created_by' ).
+  ENDMETHOD.
+
+  METHOD check_column_name_namespace.
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>check_column_name( '/DMO/FLIGHT_ID' )
+      exp = '/DMO/FLIGHT_ID' ).
+  ENDMETHOD.
+
+  METHOD check_column_name_qualified.
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>check_column_name( 'spfli~carrid' )
+      exp = 'spfli~carrid' ).
+  ENDMETHOD.
+
+  METHOD check_column_name_strict.
+    TRY.
+        cl_abap_dyn_prg=>check_column_name(
+          val    = 'spfli~carrid'
+          strict = abap_true ).
+        cl_abap_unit_assert=>fail( ).
+      CATCH cx_abap_invalid_name.
+    ENDTRY.
+  ENDMETHOD.
+
+  METHOD check_column_name_invalid.
+    TRY.
+        cl_abap_dyn_prg=>check_column_name( 'MANDT FROM T000' ).
+        cl_abap_unit_assert=>fail( ).
+      CATCH cx_abap_invalid_name.
+    ENDTRY.
+  ENDMETHOD.
+
+  METHOD check_column_name_empty.
+    TRY.
+        cl_abap_dyn_prg=>check_column_name( '' ).
+        cl_abap_unit_assert=>fail( ).
+      CATCH cx_abap_invalid_name.
+    ENDTRY.
+  ENDMETHOD.
+
+ENDCLASS.
+
+
+CLASS ltcl_package_check DEFINITION FOR TESTING RISK LEVEL HARMLESS DURATION SHORT FINAL.
+
+  PRIVATE SECTION.
+    METHODS teardown.
+    METHODS set_package
+      IMPORTING
+        iv_package TYPE tadir-devclass.
+    METHODS package_matches FOR TESTING RAISING cx_static_check.
+    METHODS package_in_list FOR TESTING RAISING cx_static_check.
+    METHODS package_lower_case FOR TESTING RAISING cx_static_check.
+    METHODS package_differs FOR TESTING RAISING cx_static_check.
+    METHODS local_object_accepted FOR TESTING RAISING cx_static_check.
+    METHODS no_packages_accepted FOR TESTING RAISING cx_static_check.
+    METHODS package_differs_with_doubles FOR TESTING RAISING cx_static_check.
+
+ENDCLASS.
+
+CLASS ltcl_package_check IMPLEMENTATION.
+
+  METHOD set_package.
+    UPDATE tadir SET devclass = @iv_package
+      WHERE pgmid = 'R3TR' AND object = 'TABL' AND obj_name = 'T000'.
+    cl_abap_unit_assert=>assert_subrc( ).
+  ENDMETHOD.
+
+  METHOD teardown.
+* the transpiler registers every object under $TMP
+    set_package( '$TMP' ).
+  ENDMETHOD.
+
+  METHOD package_matches.
+    set_package( 'ZPACKAGE' ).
+
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>check_table_name_str(
+        val      = 'T000'
+        packages = 'ZPACKAGE' )
+      exp = 'T000' ).
+  ENDMETHOD.
+
+  METHOD package_in_list.
+    set_package( 'ZPACKAGE' ).
+
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>check_table_name_str(
+        val      = 'T000'
+        packages = 'ZOTHER, ZPACKAGE' )
+      exp = 'T000' ).
+  ENDMETHOD.
+
+  METHOD package_lower_case.
+    set_package( 'ZPACKAGE' ).
+
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>check_table_name_str(
+        val      = 't000'
+        packages = 'zpackage' )
+      exp = 't000' ).
+  ENDMETHOD.
+
+  METHOD package_differs.
+    set_package( 'ZPACKAGE' ).
+
+    TRY.
+        cl_abap_dyn_prg=>check_table_name_str(
+          val      = 'T000'
+          packages = 'ZOTHER' ).
+        cl_abap_unit_assert=>fail( ).
+      CATCH cx_abap_not_in_package.
+        " expected
+    ENDTRY.
+  ENDMETHOD.
+
+  METHOD local_object_accepted.
+* nothing is known about the package of a $TMP object
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>check_table_name_str(
+        val      = 'T000'
+        packages = 'ZOTHER' )
+      exp = 'T000' ).
+  ENDMETHOD.
+
+  METHOD no_packages_accepted.
+    set_package( 'ZPACKAGE' ).
+
+    cl_abap_unit_assert=>assert_equals(
+      act = cl_abap_dyn_prg=>check_table_name_str(
+        val      = 'T000'
+        packages = '' )
+      exp = 'T000' ).
+  ENDMETHOD.
+
+  METHOD package_differs_with_doubles.
+    DATA lt_tables      TYPE if_osql_test_environment=>ty_t_sobjnames.
+    DATA lo_environment TYPE REF TO if_osql_test_environment.
+    DATA lv_raised      TYPE abap_bool.
+
+    set_package( 'ZPACKAGE' ).
+
+* TADIR is not doubled, the check must still find the package
+    APPEND 'T000' TO lt_tables.
+    lo_environment = cl_osql_test_environment=>create( lt_tables ).
+
+    TRY.
+        cl_abap_dyn_prg=>check_table_name_str(
+          val      = 'T000'
+          packages = 'ZOTHER' ).
+      CATCH cx_abap_not_in_package.
+        lv_raised = abap_true.
+    ENDTRY.
+
+    lo_environment->destroy( ).
+
+    cl_abap_unit_assert=>assert_true( lv_raised ).
+  ENDMETHOD.
+
+ENDCLASS.

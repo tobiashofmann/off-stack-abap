@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_DTEL" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <DD04V>
+    <ROLLNAME>RS38L_TYP</ROLLNAME>
+    <DDLANGUAGE>E</DDLANGUAGE>
+    <DOMNAME>RS38L_TYP</DOMNAME>
+    <HEADLEN>30</HEADLEN>
+    <SCRLEN1>10</SCRLEN1>
+    <SCRLEN2>15</SCRLEN2>
+    <SCRLEN3>20</SCRLEN3>
+    <DDTEXT>Associated Type of an Interface Parameter</DDTEXT>
+    <REPTEXT>Associated Type</REPTEXT>
+    <SCRTEXT_S>Type</SCRTEXT_S>
+    <SCRTEXT_M>Associated Type</SCRTEXT_M>
+    <SCRTEXT_L>Associated Type</SCRTEXT_L>
+    <DTELMASTER>D</DTELMASTER>
+    <REFKIND>D</REFKIND>
+   </DD04V>
+   <LONGTEXTS>
+    <item>
+     <DOKIL>
+      <ID>DE</ID>
+      <OBJECT>RS38L_TYP</OBJECT>
+      <LANGU>D</LANGU>
+      <TYP>E</TYP>
+      <VERSION>0007</VERSION>
+      <MASTERLANG>X</MASTERLANG>
+      <TXTLINES>00011</TXTLINES>
+      <DOKSTATE>A</DOKSTATE>
+     </DOKIL>
+     <HEAD>
+      <TDOBJECT>DOKU</TDOBJECT>
+      <TDNAME>RS38L_TYP</TDNAME>
+      <TDID>DE</TDID>
+      <TDSPRAS>D</TDSPRAS>
+      <TDFORM>S_DOCU_SHOW</TDFORM>
+      <TDSTYLE>S_DOCUS1</TDSTYLE>
+      <TDVERSION>00007</TDVERSION>
+      <TDLINESIZE>072</TDLINESIZE>
+     </HEAD>
+     <LINES>
+      <TLINE>
+       <TDFORMAT>U1</TDFORMAT>
+       <TDLINE>&amp;DEFINITION&amp;</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>AS</TDFORMAT>
+       <TDLINE>ABAP Bezugstyp eines Schnittstellenparameters. Der Bezugstyp muß ein</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>globaler Dictionarytyp sein oder in einem Typpool liegen. In diesem</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>Fall muß zusätzlich der Typpool im Top-Include deklariert werden.</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>AS</TDFORMAT>
+       <TDLINE>Beachten Sie, daß für RFC-fähige Funktionsbausteine Typen aus Typpools</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>nicht erlaubt sind.</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>AS</TDFORMAT>
+       <TDLINE>Bei der Typisierung mit LIKE sind nur globale Dictionarytypen erlaubt,</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>keine Typen aus Typepools.</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>AS</TDFORMAT>
+       <TDLINE>Zusätzlich hierzu können die ABAP-internen Typen C, I, N, X, P, D, T, F</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>und der Typ TABLE - teilweise in generischer Form - verwendet werden.</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>AS</TDFORMAT>
+       <TDLINE>Weitere Informationen finden Sie im Handbuch zur Funktionsbibliothek</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDLINE>und in der ABAP-Online-Dokumentation unter dem Stichwort Types.</TDLINE>
+      </TLINE>
+      <TLINE>
+       <TDFORMAT>AS</TDFORMAT>
+      </TLINE>
+     </LINES>
+    </item>
+   </LONGTEXTS>
+  </asx:values>
+ </asx:abap>
+</abapGit>
