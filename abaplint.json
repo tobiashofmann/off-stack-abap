@@ -5,10 +5,15 @@
   },
   "dependencies": [
     {
-      "url": "https://github.com/abaplint/deps",
-      "folder": "/deps",
+      "url": "https://github.com/open-abap/open-abap-core",
+      "folder": "/deps1",
       "files": "/src/**/*.*"
-    }
+    },
+    {
+      "url": "https://github.com/open-abap/open-abap-seo",
+      "folder": "/deps2",
+      "files": "/src/**/*.*"
+    }    
   ],
   "syntax": {
     "version": {
